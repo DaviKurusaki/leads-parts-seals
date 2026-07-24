@@ -1,0 +1,163 @@
+{
+  "Fabricante/Vedações": {
+    "perfil": "fabricante ou transformador especializado em vedações",
+    "aplicacoes": "itens fora de padrão, picos de demanda, protótipos, reposições urgentes e lotes que exigem processo ou material específico",
+    "produtos": "componentes usinados e moldados em PTFE puro ou carregado, PU, NBR, FKM e materiais técnicos, conforme desenho ou amostra",
+    "diferencial": "atuar como apoio produtivo complementar, preservando a relação comercial de vocês com o cliente final",
+    "cta": "Existe hoje algum item especial, urgente ou de baixa quantidade que esteja ocupando capacidade ou ficando sem atendimento?"
+  },
+  "Vedações": {
+    "perfil": "especialista ou revenda de vedações industriais",
+    "aplicacoes": "gaxetas, raspadores, anéis guia, vedações de haste e pistão, retentores especiais e reposições fora de linha",
+    "produtos": "peças sob medida em PTFE puro ou carregado, poliuretano, NBR, FKM, nylon e outros materiais técnicos",
+    "diferencial": "complementar o portfólio com itens especiais, pequenas e médias séries, urgências e fabricação por desenho ou amostra",
+    "cta": "Vocês recebem consultas de peças especiais que acabam sem atendimento por prazo, material, quantidade ou ausência de desenho?"
+  },
+  "Hidráulica/Vedações": {
+    "perfil": "fornecedor de componentes hidráulicos e vedações",
+    "aplicacoes": "gaxetas de haste e pistão, raspadores, anéis guia, vedações rotativas e kits para cilindros hidráulicos",
+    "produtos": "vedações em PU, PTFE puro ou carregado, NBR e FKM, dimensionadas conforme pressão, velocidade, fluido e temperatura",
+    "diferencial": "apoiar reformas e montagens com peças não padronizadas, reposições antigas e fabricação rápida por amostra ou desenho",
+    "cta": "Há cilindros ou equipamentos para os quais vocês têm dificuldade de localizar a vedação correta ou cumprir o prazo do cliente?"
+  },
+  "Hidráulica": {
+    "perfil": "fornecedor de soluções hidráulicas",
+    "aplicacoes": "vedações de cilindros, raspadores, anéis guia, gaxetas e componentes de reposição",
+    "produtos": "componentes em PU, PTFE, NBR e FKM fabricados conforme alojamento, pressão e fluido",
+    "diferencial": "reduzir a dependência de itens catalogados quando a medida, o material ou o prazo exigem fabricação especial",
+    "cta": "Existe algum modelo de cilindro ou equipamento cuja reposição esteja difícil de encontrar no mercado?"
+  },
+  "Hidráulica/Pneumática": {
+    "perfil": "fornecedor de componentes hidráulicos e pneumáticos",
+    "aplicacoes": "vedações de haste e pistão, raspadores, anéis guia e itens de baixo atrito",
+    "produtos": "peças em PU, PTFE, NBR e FKM desenvolvidas para pressão, velocidade e compatibilidade com o fluido",
+    "diferencial": "fornecer medidas especiais e reposições fora de catálogo com fabricação por desenho ou amostra",
+    "cta": "Quais itens hidráulicos ou pneumáticos costumam gerar mais dificuldade de reposição para vocês?"
+  },
+  "Rolamentos/Vedações": {
+    "perfil": "distribuidor de rolamentos, retentores e vedações",
+    "aplicacoes": "retentores especiais, anéis, vedações rotativas, kits e componentes para manutenção de máquinas",
+    "produtos": "peças especiais em NBR, FKM, PU e PTFE, inclusive medidas fora de catálogo",
+    "diferencial": "complementar a linha padronizada com reposições especiais e itens descontinuados",
+    "cta": "Vocês têm pedidos de retentores ou vedações em medidas especiais que não encontram nos catálogos tradicionais?"
+  },
+  "Juntas/Vedações": {
+    "perfil": "fornecedor de juntas e vedações técnicas",
+    "aplicacoes": "juntas planas, anéis, sedes, guias e componentes sujeitos a fluidos, temperatura e ataque químico",
+    "produtos": "juntas e componentes em PTFE puro ou carregado, NBR, FKM e materiais técnicos, conforme desenho",
+    "diferencial": "atender geometrias especiais, pequenas séries e aplicações em que a seleção correta do material é decisiva",
+    "cta": "Há alguma junta ou componente especial que seus clientes pedem e que hoje exige terceirização ou prazo elevado?"
+  },
+  "Vedações/Kits": {
+    "perfil": "especialista em kits e vedações de reposição",
+    "aplicacoes": "kits de cilindros, gaxetas, raspadores, anéis guia e peças especiais para manutenção",
+    "produtos": "componentes em PU, PTFE, NBR e FKM fabricados em medidas especiais",
+    "diferencial": "completar kits quando um componente não está disponível separadamente ou saiu de linha",
+    "cta": "Existem kits que vocês deixam de montar porque uma das vedações não é encontrada separadamente?"
+  },
+  "Vedações Offshore": {
+    "perfil": "fornecedor de vedações para aplicações offshore e de óleo e gás",
+    "aplicacoes": "vedações para fluidos agressivos, pressão, temperatura, baixo atrito e ambientes de manutenção crítica",
+    "produtos": "componentes em PTFE puro ou carregado, FKM, PU e NBR, com material definido após análise da aplicação",
+    "diferencial": "desenvolver peças especiais por desenho ou amostra e apoiar demandas críticas ou fora de catálogo",
+    "cta": "Há alguma aplicação offshore ou de óleo e gás em que o prazo, a geometria ou o material da vedação esteja limitando o atendimento?"
+  },
+  "Pneumática": {
+    "perfil": "fornecedor de soluções pneumáticas",
+    "aplicacoes": "vedações de baixo atrito, gaxetas, raspadores, anéis guia e componentes de atuadores",
+    "produtos": "peças em PTFE, PU, NBR e FKM dimensionadas conforme velocidade, pressão e fluido",
+    "diferencial": "atender medidas especiais e reposições fora de catálogo sem exigir grandes lotes",
+    "cta": "Há atuadores ou equipamentos pneumáticos com vedações difíceis de localizar ou que exigem medida especial?"
+  },
+  "Selos Mecânicos": {
+    "perfil": "especialista em selos mecânicos e componentes de vedação",
+    "aplicacoes": "vedações secundárias, anéis, juntas, sedes auxiliares e componentes especiais para conjuntos de selagem",
+    "produtos": "componentes em PTFE, NBR, FKM, PU e materiais técnicos conforme desenho e condição de trabalho",
+    "diferencial": "fornecer componentes auxiliares especiais, pequenas séries e reposições que não compensam produção interna",
+    "cta": "Existe algum componente secundário ou especial de selo mecânico que vocês prefeririam terceirizar?"
+  },
+  "Fabricante PTFE": {
+    "perfil": "fabricante especializado em componentes de PTFE",
+    "aplicacoes": "peças técnicas, anéis, sedes, guias e geometrias especiais para baixa fricção e resistência química",
+    "produtos": "apoio complementar em PTFE puro ou carregado e combinação com PU, NBR, FKM e outros materiais de vedação",
+    "diferencial": "absorver urgências, geometrias específicas ou demandas mistas que envolvam mais de uma família de materiais",
+    "cta": "Há itens ou picos de demanda em que uma parceria produtiva complementar faria sentido para vocês?"
+  },
+  "Fixação/Vedações": {
+    "perfil": "distribuidor de fixação e vedações",
+    "aplicacoes": "anéis, retentores, juntas e componentes especiais para manutenção e montagem industrial",
+    "produtos": "peças em PTFE, PU, NBR e FKM em medidas especiais",
+    "diferencial": "ampliar o atendimento de itens técnicos que não fazem parte da linha padronizada",
+    "cta": "Quais vedações especiais aparecem junto às demandas de fixadores e manutenção dos seus clientes?"
+  },
+  "Distribuidora": {
+    "perfil": "distribuidor de componentes industriais",
+    "aplicacoes": "reposições industriais, itens fora de linha, medidas especiais e demandas de manutenção",
+    "produtos": "vedações e componentes sob medida em PTFE, PU, NBR, FKM e materiais técnicos",
+    "diferencial": "complementar o portfólio sem necessidade de estoque amplo, produzindo por desenho ou amostra",
+    "cta": "Há famílias de vedações que seus clientes solicitam, mas que hoje ficam fora do portfólio por baixa recorrência?"
+  },
+  "Fabricante": {
+    "perfil": "fabricante de componentes industriais",
+    "aplicacoes": "componentes de vedação, guias, anéis, juntas e peças técnicas integradas ao equipamento",
+    "produtos": "peças sob desenho em PTFE, PU, NBR, FKM, nylon e materiais técnicos",
+    "diferencial": "fornecer componentes prontos para montagem, inclusive em lotes piloto, reposição e desenvolvimento",
+    "cta": "Há algum componente de vedação que hoje seja comprado como item padronizado, mas que poderia ser otimizado sob desenho?"
+  },
+  "Industrial/Vedações": {
+    "perfil": "fornecedor industrial com foco em vedações",
+    "aplicacoes": "manutenção, reposições especiais, equipamentos hidráulicos e componentes sujeitos a desgaste ou ataque químico",
+    "produtos": "peças em PTFE, PU, NBR e FKM sob medida",
+    "diferencial": "atender itens fora de catálogo, urgências e pequenas séries com suporte na definição do material",
+    "cta": "Qual tipo de vedação especial mais gera atraso ou perda de venda para a equipe de vocês?"
+  },
+  "Vedações/Industrial": {
+    "perfil": "fornecedor de vedações para manutenção industrial",
+    "aplicacoes": "reposição de máquinas, cilindros, bombas e equipamentos de processo",
+    "produtos": "peças em PTFE, PU, NBR e FKM conforme desenho ou amostra",
+    "diferencial": "resolver medidas especiais e componentes descontinuados com lotes compatíveis à necessidade",
+    "cta": "Há alguma reposição industrial que vocês recebem com frequência e não conseguem atender por falta de medida ou material?"
+  },
+  "Industrial": {
+    "perfil": "fornecedor de componentes industriais",
+    "aplicacoes": "manutenção de máquinas, conjuntos hidráulicos, bombas e equipamentos de processo",
+    "produtos": "vedações e componentes sob medida em PTFE, PU, NBR e FKM",
+    "diferencial": "adicionar uma fonte de peças especiais sem necessidade de manter estoque",
+    "cta": "Existe alguma demanda de vedação ou componente técnico que hoje vocês direcionam para terceiros?"
+  },
+  "Distribuidor Parker": {
+    "perfil": "distribuidor de componentes hidráulicos de linha",
+    "aplicacoes": "vedações especiais para cilindros, equipamentos antigos e medidas que não constam no catálogo",
+    "produtos": "gaxetas, raspadores, anéis guia e peças em PU, PTFE, NBR e FKM sob medida",
+    "diferencial": "complementar a linha Parker em aplicações especiais, sem substituir os itens padronizados",
+    "cta": "Quais medidas ou equipamentos ficam fora da linha catalogada e acabam exigindo uma solução especial?"
+  },
+  "Distribuidor Sabó": {
+    "perfil": "distribuidor de retentores e vedações de linha",
+    "aplicacoes": "retentores especiais, medidas fora de catálogo e reposições industriais antigas",
+    "produtos": "peças em NBR, FKM, PU e PTFE conforme amostra ou desenho",
+    "diferencial": "complementar a linha Sabó quando o item é especial, descontinuado ou de baixa quantidade",
+    "cta": "Há pedidos de retentores ou vedações especiais que hoje não encontram correspondência na linha catalogada?"
+  },
+  "Distribuidor AGEL/APC": {
+    "perfil": "distribuidor de componentes e vedações de linha",
+    "aplicacoes": "itens especiais, medidas fora de catálogo e reposições de manutenção",
+    "produtos": "vedações em PTFE, PU, NBR e FKM sob desenho ou amostra",
+    "diferencial": "complementar as marcas distribuídas sem competir com os itens padronizados",
+    "cta": "Quais itens especiais aparecem com mais frequência fora das linhas que vocês distribuem?"
+  },
+  "Distribuidor Vedabrás": {
+    "perfil": "distribuidor de vedações de linha",
+    "aplicacoes": "medidas especiais, itens fora de catálogo e reposições urgentes",
+    "produtos": "peças em PTFE, PU, NBR e FKM sob medida",
+    "diferencial": "complementar a linha Vedabrás em demandas especiais e pequenas séries",
+    "cta": "Há medidas ou materiais que seus clientes pedem e que não estão disponíveis na linha regular?"
+  },
+  "Distribuidor Vedabrás/Joinseal": {
+    "perfil": "distribuidor de vedações e componentes de linha",
+    "aplicacoes": "itens especiais, medidas fora de catálogo, kits e reposições industriais",
+    "produtos": "peças em PTFE, PU, NBR e FKM sob desenho ou amostra",
+    "diferencial": "complementar as linhas distribuídas com fabricação especial e baixa quantidade",
+    "cta": "Quais demandas especiais ficam sem solução nas linhas padronizadas que vocês trabalham?"
+  }
+}

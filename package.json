@@ -1,0 +1,26 @@
+{
+  "name": "parts-seals-automacao-prospeccao",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Fila de aprovação, envio controlado e acompanhamento de prospecção B2B da Parts Seals.",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "dns": "node src/dnsCheck.js",
+    "test": "node --test tests/*.test.js",
+    "check": "node --check src/server.js && node --check src/scheduler.js && node --check src/inbox.js && node --check src/mailer.js && node --check src/workbook.js && node --check public/app.js",
+    "research": "node src/researchBatch.js"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "express": "^5.1.0",
+    "imapflow": "^1.0.181",
+    "mailparser": "^3.7.4",
+    "nodemailer": "^9.0.3",
+    "openai": "^5.12.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

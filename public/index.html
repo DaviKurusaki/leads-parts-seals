@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Parts Seals — Prospecção</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <div class="eyebrow">PARTS SEALS</div>
+      <h1>Central de Prospecção</h1>
+      <p>Pesquisa, aprovação, envio controlado e acompanhamento em uma única fila.</p>
+    </div>
+    <div class="mode" id="modeBadge">Carregando...</div>
+  </header>
+
+  <main>
+    <section class="stats" id="stats"></section>
+
+    <section class="panel controls">
+      <div class="panel-title">
+        <div>
+          <h2>Controle da campanha</h2>
+          <p>O envio real só funciona com modo live, domínio confirmado e SMTP válido.</p>
+        </div>
+        <span id="campaignBadge" class="badge neutral">Pausada</span>
+      </div>
+      <div class="button-row">
+        <button id="startCampaign" class="primary">Iniciar campanha</button>
+        <button id="pauseCampaign">Pausar</button>
+        <button id="sendNext">Processar próximo</button>
+        <button id="syncInbox">Sincronizar respostas</button>
+        <button id="verifySmtp">Testar SMTP</button>
+        <a class="button-link" href="/api/export.csv">Exportar resultado</a>
+      </div>
+      <div id="statusMessage" class="message hidden"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-title">
+        <div>
+          <h2>Fila de empresas</h2>
+          <p>Abra um cadastro para revisar o texto, pesquisar, aprovar ou bloquear.</p>
+        </div>
+        <button id="approveHigh">Aprovar somente alta confiança</button>
+      </div>
+
+      <div class="filters">
+        <input id="search" placeholder="Buscar empresa, cidade, segmento ou e-mail">
+        <select id="confidence">
+          <option value="">Todas as confianças</option>
+          <option>Alta</option>
+          <option>Moderada</option>
+          <option>Baixa</option>
+        </select>
+        <select id="approval">
+          <option value="">Todos os estados</option>
+          <option value="pending">Aguardando aprovação</option>
+          <option value="approved">Aprovados</option>
+          <option value="blocked">Bloqueados/sem e-mail</option>
+        </select>
+        <button id="applyFilters">Aplicar</button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>Empresa</th><th>Local</th><th>Segmento</th><th>E-mail</th>
+              <th>Confiança</th><th>Status</th><th>Aprovação</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="leadRows"></tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button id="prevPage">Anterior</button>
+        <span id="pageInfo"></span>
+        <button id="nextPage">Próxima</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-title"><div><h2>Últimos eventos</h2><p>Registro de aprovações, envios, respostas e bloqueios.</p></div></div>
+      <div id="events" class="events"></div>
+    </section>
+  </main>
+
+  <dialog id="leadDialog">
+    <form method="dialog" class="dialog-shell">
+      <div class="dialog-header">
+        <div><div class="eyebrow">REVISÃO DO LEAD</div><h2 id="dialogCompany"></h2><p id="dialogMeta"></p></div>
+        <button value="cancel" class="icon-button" aria-label="Fechar">×</button>
+      </div>
+      <div class="dialog-grid">
+        <div class="main-edit">
+          <label>Assunto<input id="editSubject"></label>
+          <label>E-mail inicial<textarea id="editInitial" rows="15"></textarea></label>
+          <label>Follow-up 1<textarea id="editFollow1" rows="9"></textarea></label>
+          <label>Follow-up 2<textarea id="editFollow2" rows="9"></textarea></label>
+          <label>Observações<textarea id="editNotes" rows="4"></textarea></label>
+        </div>
+        <aside>
+          <div class="info-card"><b>Confiança</b><span id="dialogConfidence"></span></div>
+          <div class="info-card"><b>Fonte específica</b><a id="dialogSource" target="_blank" rel="noreferrer"></a></div>
+          <div class="info-card"><b>Base da personalização</b><p id="dialogBasis"></p></div>
+          <div class="info-card"><b>Aplicações</b><p id="dialogApplications"></p></div>
+          <div class="info-card"><b>Produtos sugeridos</b><p id="dialogProducts"></p></div>
+          <div class="info-card" id="researchCard"><b>Pesquisa com IA</b><pre id="researchOutput">Ainda não executada.</pre></div>
+        </aside>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" id="saveLead">Salvar alterações</button>
+        <button type="button" id="researchLead">Pesquisar empresa</button>
+        <button type="button" id="applyResearch">Aplicar texto pesquisado</button>
+        <button type="button" id="testLead">Gerar/enviar teste</button>
+        <button type="button" id="approveLead" class="primary">Aprovar</button>
+        <button type="button" id="optoutLead" class="danger">Bloquear/opt-out</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

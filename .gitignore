@@ -1,0 +1,7 @@
+node_modules/
+.env
+data/state.json
+data/dry-run/
+data/logs/
+tmp/
+*.log

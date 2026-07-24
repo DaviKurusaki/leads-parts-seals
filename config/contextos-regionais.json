@@ -1,0 +1,310 @@
+{
+  "cidades": {
+    "Serra|ES": {
+      "mercados": "petróleo e gás, mineração, metalurgia, operações portuárias e celulose",
+      "materiais": "PTFE puro ou carregado, FKM e PU"
+    },
+    "Macaé|RJ": {
+      "mercados": "óleo e gás, offshore e manutenção de equipamentos críticos",
+      "materiais": "PTFE puro ou carregado, FKM e PU"
+    },
+    "Rio de Janeiro|RJ": {
+      "mercados": "óleo e gás, naval, químico, energia e manutenção industrial",
+      "materiais": "PTFE, FKM e PU"
+    },
+    "Duque de Caxias|RJ": {
+      "mercados": "refino, petroquímica, logística e manutenção industrial",
+      "materiais": "PTFE, FKM e NBR"
+    },
+    "Mesquita|RJ": {
+      "mercados": "manutenção industrial, logística e atendimento à cadeia fluminense de óleo e gás",
+      "materiais": "PTFE, FKM e PU"
+    },
+    "Belo Horizonte|MG": {
+      "mercados": "mineração, metalurgia, cimento, alimentos e manutenção industrial",
+      "materiais": "PU, PTFE carregado, NBR e FKM"
+    },
+    "Contagem|MG": {
+      "mercados": "metalurgia, automotivo, mineração e manutenção de máquinas",
+      "materiais": "PU, NBR, PTFE carregado e FKM"
+    },
+    "Betim|MG": {
+      "mercados": "automotivo, metalurgia, mineração e manutenção industrial",
+      "materiais": "PU, NBR, PTFE e FKM"
+    },
+    "Divinópolis|MG": {
+      "mercados": "metalurgia, fundição, mineração e manutenção industrial",
+      "materiais": "PU, NBR e PTFE carregado"
+    },
+    "Uberlândia|MG": {
+      "mercados": "agroindústria, alimentos, logística e manutenção de equipamentos",
+      "materiais": "NBR, PU, PTFE e FKM"
+    },
+    "Sertãozinho|SP": {
+      "mercados": "açúcar e etanol, bombas, válvulas, caldeiraria e máquinas pesadas",
+      "materiais": "PU, PTFE, NBR e FKM"
+    },
+    "Piracicaba|SP": {
+      "mercados": "açúcar e etanol, máquinas agrícolas, metalmecânico e automotivo",
+      "materiais": "PU, PTFE, NBR e FKM"
+    },
+    "Ribeirão Preto|SP": {
+      "mercados": "agroindústria, açúcar e etanol, alimentos e manutenção de máquinas",
+      "materiais": "PU, NBR, PTFE e FKM"
+    },
+    "São José dos Campos|SP": {
+      "mercados": "aeroespacial, automotivo, químico e máquinas de precisão",
+      "materiais": "PTFE, PU, FKM e NBR"
+    },
+    "Santos|SP": {
+      "mercados": "operações portuárias, logística, petroquímica e manutenção naval",
+      "materiais": "PTFE, FKM, PU e NBR"
+    },
+    "Campinas|SP": {
+      "mercados": "máquinas e equipamentos, químico, alimentos, tecnologia e manutenção industrial",
+      "materiais": "PTFE, PU, NBR e FKM"
+    },
+    "Jundiaí|SP": {
+      "mercados": "máquinas, automotivo, alimentos, bebidas e logística industrial",
+      "materiais": "PU, NBR, PTFE e FKM"
+    },
+    "Sorocaba|SP": {
+      "mercados": "máquinas pesadas, automotivo, metalmecânico e manutenção industrial",
+      "materiais": "PU, NBR, PTFE e FKM"
+    },
+    "Guarulhos|SP": {
+      "mercados": "metalmecânico, químico, logística, automotivo e manutenção industrial",
+      "materiais": "PU, NBR, PTFE e FKM"
+    },
+    "São Bernardo do Campo|SP": {
+      "mercados": "automotivo, metalmecânico e manutenção de linhas produtivas",
+      "materiais": "PU, NBR, PTFE e FKM"
+    },
+    "Santo André|SP": {
+      "mercados": "petroquímica, metalmecânico, automotivo e manutenção industrial",
+      "materiais": "PTFE, FKM, PU e NBR"
+    },
+    "São Caetano do Sul|SP": {
+      "mercados": "automotivo, metalmecânico e manutenção industrial",
+      "materiais": "PU, NBR, PTFE e FKM"
+    },
+    "Diadema|SP": {
+      "mercados": "químico, plástico, metalmecânico e automotivo",
+      "materiais": "PTFE, FKM, NBR e PU"
+    },
+    "Mauá|SP": {
+      "mercados": "petroquímica, químico, metalmecânico e manutenção industrial",
+      "materiais": "PTFE, FKM, NBR e PU"
+    },
+    "Joinville|SC": {
+      "mercados": "metalmecânico, máquinas, fundição, plástico e manutenção industrial",
+      "materiais": "PU, NBR, PTFE e FKM"
+    },
+    "Blumenau|SC": {
+      "mercados": "têxtil, máquinas, alimentos, plástico e manutenção industrial",
+      "materiais": "NBR, PU, PTFE e FKM"
+    },
+    "Itajaí|SC": {
+      "mercados": "operações portuárias, alimentos, naval e manutenção industrial",
+      "materiais": "PTFE, FKM, PU e NBR"
+    },
+    "Chapecó|SC": {
+      "mercados": "alimentos, frigoríficos, agroindústria e máquinas",
+      "materiais": "NBR, PU, PTFE e FKM"
+    },
+    "Caxias do Sul|RS": {
+      "mercados": "metalmecânico, implementos, automotivo, máquinas e alimentos",
+      "materiais": "PU, NBR, PTFE e FKM"
+    },
+    "Porto Alegre|RS": {
+      "mercados": "metalmecânico, alimentos, química, energia e manutenção industrial",
+      "materiais": "NBR, PU, PTFE e FKM"
+    },
+    "Canoas|RS": {
+      "mercados": "refino, metalmecânico, logística e manutenção industrial",
+      "materiais": "PTFE, FKM, PU e NBR"
+    },
+    "Novo Hamburgo|RS": {
+      "mercados": "calçados, máquinas, borracha, plástico e manutenção industrial",
+      "materiais": "NBR, PU e PTFE"
+    },
+    "Curitiba|PR": {
+      "mercados": "automotivo, máquinas, alimentos, químico e manutenção industrial",
+      "materiais": "PU, NBR, PTFE e FKM"
+    },
+    "São José dos Pinhais|PR": {
+      "mercados": "automotivo, máquinas e manutenção de linhas produtivas",
+      "materiais": "PU, NBR, PTFE e FKM"
+    },
+    "Ponta Grossa|PR": {
+      "mercados": "agroindústria, alimentos, papel e celulose e máquinas",
+      "materiais": "NBR, PU, PTFE e FKM"
+    },
+    "Maringá|PR": {
+      "mercados": "agroindústria, alimentos, máquinas e manutenção industrial",
+      "materiais": "NBR, PU, PTFE e FKM"
+    },
+    "Londrina|PR": {
+      "mercados": "agroindústria, alimentos, máquinas e química",
+      "materiais": "NBR, PU, PTFE e FKM"
+    },
+    "Cascavel|PR": {
+      "mercados": "agroindústria, alimentos e manutenção de máquinas",
+      "materiais": "NBR, PU, PTFE e FKM"
+    },
+    "Goiânia|GO": {
+      "mercados": "agroindústria, alimentos, mineração e manutenção de equipamentos",
+      "materiais": "NBR, PU, PTFE e FKM"
+    },
+    "Rio Verde|GO": {
+      "mercados": "agroindústria, processamento de grãos, alimentos e máquinas agrícolas",
+      "materiais": "NBR, PU, PTFE e FKM"
+    },
+    "Sorriso|MT": {
+      "mercados": "agroindústria, grãos, armazenagem e máquinas agrícolas",
+      "materiais": "NBR, PU, PTFE e FKM"
+    },
+    "Sinop|MT": {
+      "mercados": "agroindústria, madeira, grãos e máquinas agrícolas",
+      "materiais": "NBR, PU, PTFE e FKM"
+    },
+    "Rondonópolis|MT": {
+      "mercados": "agroindústria, logística, fertilizantes e máquinas",
+      "materiais": "NBR, PU, PTFE e FKM"
+    },
+    "Várzea Grande|MT": {
+      "mercados": "alimentos, frigoríficos, logística e manutenção industrial",
+      "materiais": "NBR, PU, PTFE e FKM"
+    },
+    "Campo Grande|MS": {
+      "mercados": "agroindústria, alimentos, celulose e manutenção de equipamentos",
+      "materiais": "NBR, PU, PTFE e FKM"
+    },
+    "Salvador|BA": {
+      "mercados": "petroquímica, óleo e gás, alimentos, portos e manutenção industrial",
+      "materiais": "PTFE, FKM, PU e NBR"
+    },
+    "Camaçari|BA": {
+      "mercados": "petroquímica, química, automotivo e manutenção de processo",
+      "materiais": "PTFE, FKM, NBR e PU"
+    },
+    "Simões Filho|BA": {
+      "mercados": "logística, petroquímica, metalmecânico e manutenção industrial",
+      "materiais": "PTFE, FKM, PU e NBR"
+    },
+    "Recife|PE": {
+      "mercados": "alimentos, químico, metalmecânico, energia e manutenção industrial",
+      "materiais": "NBR, PU, PTFE e FKM"
+    },
+    "Jaboatão dos Guararapes|PE": {
+      "mercados": "logística, alimentos, portos e manutenção industrial",
+      "materiais": "NBR, PU, PTFE e FKM"
+    },
+    "Fortaleza|CE": {
+      "mercados": "alimentos, bebidas, energia, têxtil e manutenção industrial",
+      "materiais": "NBR, PU, PTFE e FKM"
+    },
+    "João Pessoa|PB": {
+      "mercados": "alimentos, bebidas, têxtil e manutenção industrial",
+      "materiais": "NBR, PU, PTFE e FKM"
+    },
+    "Natal|RN": {
+      "mercados": "óleo e gás, energia, alimentos e manutenção industrial",
+      "materiais": "PTFE, FKM, PU e NBR"
+    },
+    "Aracaju|SE": {
+      "mercados": "óleo e gás, fertilizantes, alimentos e manutenção industrial",
+      "materiais": "PTFE, FKM, PU e NBR"
+    },
+    "Manaus|AM": {
+      "mercados": "eletroeletrônico, duas rodas, plástico, bebidas e manutenção do Polo Industrial",
+      "materiais": "PTFE, PU, NBR e FKM"
+    },
+    "Belém|PA": {
+      "mercados": "mineração, operações portuárias, alimentos, madeira e manutenção industrial",
+      "materiais": "PU, PTFE carregado, NBR e FKM"
+    },
+    "Brasília|DF": {
+      "mercados": "manutenção predial e industrial, alimentos, logística e serviços técnicos",
+      "materiais": "NBR, PU, PTFE e FKM"
+    }
+  },
+  "estados": {
+    "ES": {
+      "mercados": "petróleo e gás, mineração, metalurgia, portos e celulose",
+      "materiais": "PTFE puro ou carregado, FKM e PU"
+    },
+    "MG": {
+      "mercados": "mineração, metalurgia, alimentos, cimento e manutenção industrial",
+      "materiais": "PU, PTFE carregado, NBR e FKM"
+    },
+    "RJ": {
+      "mercados": "óleo e gás, naval, química, energia e manutenção industrial",
+      "materiais": "PTFE, FKM e PU"
+    },
+    "SP": {
+      "mercados": "máquinas, automotivo, químico, alimentos e manutenção industrial",
+      "materiais": "PU, NBR, PTFE e FKM"
+    },
+    "PR": {
+      "mercados": "agroindústria, alimentos, automotivo, máquinas e papel e celulose",
+      "materiais": "NBR, PU, PTFE e FKM"
+    },
+    "SC": {
+      "mercados": "metalmecânico, máquinas, alimentos, têxtil e plástico",
+      "materiais": "PU, NBR, PTFE e FKM"
+    },
+    "RS": {
+      "mercados": "metalmecânico, máquinas, alimentos, automotivo e química",
+      "materiais": "PU, NBR, PTFE e FKM"
+    },
+    "GO": {
+      "mercados": "agroindústria, alimentos, mineração e máquinas",
+      "materiais": "NBR, PU, PTFE e FKM"
+    },
+    "MT": {
+      "mercados": "agroindústria, grãos, alimentos, logística e máquinas agrícolas",
+      "materiais": "NBR, PU, PTFE e FKM"
+    },
+    "MS": {
+      "mercados": "agroindústria, celulose, alimentos e manutenção de equipamentos",
+      "materiais": "NBR, PU, PTFE e FKM"
+    },
+    "DF": {
+      "mercados": "serviços técnicos, manutenção, alimentos e logística",
+      "materiais": "NBR, PU, PTFE e FKM"
+    },
+    "BA": {
+      "mercados": "petroquímica, mineração, celulose, alimentos e portos",
+      "materiais": "PTFE, FKM, PU e NBR"
+    },
+    "PE": {
+      "mercados": "alimentos, químico, energia, portos e manutenção industrial",
+      "materiais": "NBR, PU, PTFE e FKM"
+    },
+    "CE": {
+      "mercados": "alimentos, têxtil, energia, bebidas e manutenção industrial",
+      "materiais": "NBR, PU, PTFE e FKM"
+    },
+    "PB": {
+      "mercados": "alimentos, bebidas, têxtil e manutenção industrial",
+      "materiais": "NBR, PU, PTFE e FKM"
+    },
+    "RN": {
+      "mercados": "óleo e gás, energia, alimentos e manutenção industrial",
+      "materiais": "PTFE, FKM, PU e NBR"
+    },
+    "SE": {
+      "mercados": "óleo e gás, fertilizantes, alimentos e manutenção industrial",
+      "materiais": "PTFE, FKM, PU e NBR"
+    },
+    "AM": {
+      "mercados": "eletroeletrônico, duas rodas, plástico, bebidas e manutenção industrial",
+      "materiais": "PTFE, PU, NBR e FKM"
+    },
+    "PA": {
+      "mercados": "mineração, portos, alimentos, madeira e manutenção industrial",
+      "materiais": "PU, PTFE carregado, NBR e FKM"
+    }
+  }
+}
