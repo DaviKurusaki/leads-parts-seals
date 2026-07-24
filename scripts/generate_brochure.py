@@ -15,7 +15,7 @@ from svglib.svglib import svg2rlg
 
 
 ROOT = Path(__file__).resolve().parents[1]
-OUTPUT = ROOT / "output" / "pdf" / "apresentacao-comercial-parts-seals-v2.pdf"
+OUTPUT = ROOT / "output" / "pdf" / "apresentacao-comercial-parts-seals-v3.pdf"
 ASSETS = ROOT / "assets"
 ICONS = ASSETS / "icons" / "tabler"
 
@@ -441,7 +441,6 @@ def page_three(c):
         ("chef-hat", "Alimentícia"),
         ("pill", "Farmacêutica"),
         ("building-factory-2", "Mineração"),
-        ("building", "Construção"),
         ("tractor", "Máquinas agrícolas"),
         ("building-factory-2", "Metalurgia"),
         ("leaf", "Papel e celulose"),
@@ -452,10 +451,13 @@ def page_three(c):
         ("tractor", "Linha verde"),
     ]
     pill_w = 160
+    last_row = (len(sectors) - 1) // 3
+    last_row_count = len(sectors) % 3 or 3
     for index, (icon_name, label) in enumerate(sectors):
         col = index % 3
         row = index // 3
-        sector_pill(c, 42 + col * 171, panel_y + 188 - row * 44,
+        row_offset = (3 - last_row_count) * 171 / 2 if row == last_row else 0
+        sector_pill(c, 42 + row_offset + col * 171, panel_y + 188 - row * 44,
                     pill_w, icon_name, label)
 
     paragraph(c, "Um fluxo claro, do briefing à entrega", 34, panel_y - 30, 390,
