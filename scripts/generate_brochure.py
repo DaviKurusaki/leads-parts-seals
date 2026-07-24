@@ -319,6 +319,21 @@ def page_two(c):
         color=MID,
     )
 
+    c.setFillColor(RED_LIGHT)
+    c.roundRect(34, H - 168, W - 68, 25, 12.5, fill=1, stroke=0)
+    c.setFillColor(RED)
+    c.roundRect(40, H - 164, 126, 17, 8.5, fill=1, stroke=0)
+    c.setFillColor(white)
+    c.setFont("Segoe-Bold", 6.3)
+    c.drawCentredString(103, H - 158, "PARA REVENDEDORES")
+    c.setFillColor(RED_DARK)
+    c.setFont("Segoe-Semibold", 7)
+    c.drawString(
+        177,
+        H - 158,
+        "Preços competitivos e prazos diferenciados para fortalecer sua operação.",
+    )
+
     photo_tile(c, PHOTO_COMPONENTS, 34, H - 318, 166, 145,
                "Gaxetas, anéis e raspadores")
     photo_tile(c, PHOTO_GUIDES, 215, H - 318, 166, 145,
