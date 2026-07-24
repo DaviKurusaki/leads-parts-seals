@@ -26,7 +26,7 @@ export const config = Object.freeze({
   senderSite: process.env.SENDER_SITE || 'https://parts-seals.com.br',
   replyTo: process.env.REPLY_TO || process.env.SENDER_EMAIL || '',
   brochureFile: path.resolve(
-    process.env.BROCHURE_FILE || './output/pdf/apresentacao-comercial-parts-seals.pdf',
+    process.env.BROCHURE_FILE || './output/pdf/apresentacao-comercial-parts-seals-v2.pdf',
   ),
 
   smtp: {

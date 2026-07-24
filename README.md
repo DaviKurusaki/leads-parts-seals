@@ -89,8 +89,12 @@ O primeiro e-mail de cada sequência inclui automaticamente o PDF definido em
 após alterar textos ou identidade visual, execute:
 
 ```bash
+pip install -r requirements-pdf.txt
 python scripts/generate_brochure.py
 ```
+
+A apresentação usa a identidade visual e as fotos oficiais da Parts Seals, além
+dos ícones SVG do projeto Tabler Icons, distribuídos sob licença MIT.
 
 ## Configuração IMAP
 

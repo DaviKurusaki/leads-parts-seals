@@ -1,5 +1,7 @@
+from io import BytesIO
 from pathlib import Path
 
+from reportlab.graphics import renderPDF
 from reportlab.lib.colors import Color, HexColor, white
 from reportlab.lib.enums import TA_LEFT
 from reportlab.lib.pagesizes import A4
@@ -9,22 +11,35 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
 from reportlab.platypus import Paragraph
+from svglib.svglib import svg2rlg
 
 
 ROOT = Path(__file__).resolve().parents[1]
-OUTPUT = ROOT / "output" / "pdf" / "apresentacao-comercial-parts-seals.pdf"
-HERO = ROOT / "assets" / "brochure-hero.png"
+OUTPUT = ROOT / "output" / "pdf" / "apresentacao-comercial-parts-seals-v2.pdf"
+ASSETS = ROOT / "assets"
+ICONS = ASSETS / "icons" / "tabler"
+
+LOGO_DARK = ASSETS / "logo-parts-seals-original.png"
+LOGO_WHITE = ASSETS / "logo-parts-seals-white.png"
+HERO = ASSETS / "site-hero-industrial.jpg"
+PHOTO_COMPONENTS = ASSETS / "site-seals-components.jpg"
+PHOTO_GUIDES = ASSETS / "site-product-aneis-guia.jpg"
+PHOTO_DPDH = ASSETS / "site-product-dp-dh.jpg"
+PHOTO_CUSTOM = ASSETS / "site-product-pecas-tecnicas.jpg"
 
 W, H = A4
-RED = HexColor("#B41218")
-RED_DARK = HexColor("#81080D")
-RED_LIGHT = HexColor("#F7E8E9")
-CHARCOAL = HexColor("#17191F")
-GRAPHITE = HexColor("#292C34")
-MID = HexColor("#60636B")
-LIGHT = HexColor("#F3F4F6")
-LINE = HexColor("#E2E4E8")
+RED = HexColor("#C20E19")
+RED_DARK = HexColor("#860811")
+RED_DEEP = HexColor("#64050B")
+RED_LIGHT = HexColor("#F9E7E9")
+CHARCOAL = HexColor("#111217")
+GRAPHITE = HexColor("#202229")
+GRAPHITE_2 = HexColor("#2B2E37")
+MID = HexColor("#656873")
+LIGHT = HexColor("#F2F3F5")
+LINE = HexColor("#E0E2E6")
 BLACK = HexColor("#111217")
+GOLD = HexColor("#C69A45")
 
 
 pdfmetrics.registerFont(TTFont("Segoe", r"C:\Windows\Fonts\segoeui.ttf"))
@@ -34,32 +49,58 @@ pdfmetrics.registerFont(TTFont("Segoe-Bold", r"C:\Windows\Fonts\segoeuib.ttf"))
 
 def paragraph(c, text, x, y_top, width, font="Segoe", size=9, leading=None,
               color=BLACK, align=TA_LEFT):
-    leading = leading or size * 1.3
     style = ParagraphStyle(
         name="inline",
         fontName=font,
         fontSize=size,
-        leading=leading,
+        leading=leading or size * 1.3,
         textColor=color,
         alignment=align,
         spaceAfter=0,
         spaceBefore=0,
     )
-    p = Paragraph(text, style)
-    _, height = p.wrap(width, H)
-    p.drawOn(c, x, y_top - height)
+    item = Paragraph(text, style)
+    _, height = item.wrap(width, H)
+    item.drawOn(c, x, y_top - height)
     return height
 
 
-def draw_cover_image(c, image_path, x, y, width, height):
+def draw_cover_image(c, image_path, x, y, width, height, focus_x=0.5, focus_y=0.5):
     image = ImageReader(str(image_path))
     iw, ih = image.getSize()
     scale = max(width / iw, height / ih)
     draw_w, draw_h = iw * scale, ih * scale
+    dx = x + (width - draw_w) * focus_x
+    dy = y + (height - draw_h) * focus_y
     c.saveState()
     clip = c.beginPath()
     clip.rect(x, y, width, height)
     c.clipPath(clip, stroke=0, fill=0)
+    c.drawImage(image, dx, dy, draw_w, draw_h, mask="auto")
+    c.restoreState()
+
+
+def draw_rounded_image(c, image_path, x, y, width, height, radius=9,
+                       focus_x=0.5, focus_y=0.5):
+    image = ImageReader(str(image_path))
+    iw, ih = image.getSize()
+    scale = max(width / iw, height / ih)
+    draw_w, draw_h = iw * scale, ih * scale
+    dx = x + (width - draw_w) * focus_x
+    dy = y + (height - draw_h) * focus_y
+    c.saveState()
+    clip = c.beginPath()
+    clip.roundRect(x, y, width, height, radius)
+    c.clipPath(clip, stroke=0, fill=0)
+    c.drawImage(image, dx, dy, draw_w, draw_h, mask="auto")
+    c.restoreState()
+
+
+def draw_contain_image(c, image_path, x, y, width, height):
+    image = ImageReader(str(image_path))
+    iw, ih = image.getSize()
+    scale = min(width / iw, height / ih)
+    draw_w, draw_h = iw * scale, ih * scale
     c.drawImage(
         image,
         x + (width - draw_w) / 2,
@@ -68,85 +109,43 @@ def draw_cover_image(c, image_path, x, y, width, height):
         draw_h,
         mask="auto",
     )
-    c.restoreState()
 
 
-def brand(c, x, y, dark=False):
-    primary = white if dark else BLACK
-    c.setFillColor(RED)
-    c.roundRect(x, y - 5, 8, 23, 2, fill=1, stroke=0)
-    c.setFillColor(primary)
-    c.setFont("Segoe-Bold", 17)
-    c.drawString(x + 15, y, "PARTS")
-    c.setFillColor(RED)
-    c.drawString(x + 69, y, "SEALS")
-    c.setFillColor(primary)
-    c.setFont("Segoe", 6.8)
-    c.drawString(x + 16, y - 11, "VEDAÇÕES INDUSTRIAIS")
+def color_hex(color):
+    return color.hexval().replace("0x", "#")
 
 
-def icon(c, kind, cx, cy):
+def draw_svg(c, icon_name, x, y, size, color=RED):
+    svg_path = ICONS / f"{icon_name}.svg"
+    source = svg_path.read_text(encoding="utf-8")
+    source = source.replace("currentColor", color_hex(color))
+    drawing = svg2rlg(BytesIO(source.encode("utf-8")))
+    if not drawing or not drawing.width or not drawing.height:
+        return
+    scale = min(size / drawing.width, size / drawing.height)
+    draw_w, draw_h = drawing.width * scale, drawing.height * scale
     c.saveState()
-    c.setStrokeColor(RED)
-    c.setFillColor(RED_LIGHT)
-    c.setLineWidth(1.6)
-    c.circle(cx, cy, 17, fill=1, stroke=0)
-    c.setFillColor(Color(0, 0, 0, alpha=0))
-    if kind == "hydraulic":
-        c.rect(cx - 9, cy - 5, 18, 10, fill=0, stroke=1)
-        c.line(cx - 13, cy, cx - 9, cy)
-        c.line(cx + 9, cy, cx + 14, cy)
-        c.line(cx, cy - 5, cx, cy + 5)
-    elif kind == "pneumatic":
-        c.circle(cx - 4, cy, 6, fill=0, stroke=1)
-        c.line(cx + 2, cy, cx + 12, cy)
-        c.line(cx + 8, cy - 4, cx + 12, cy)
-        c.line(cx + 8, cy + 4, cx + 12, cy)
-    elif kind == "rotary":
-        c.circle(cx, cy, 9, fill=0, stroke=1)
-        c.circle(cx, cy, 3, fill=0, stroke=1)
-        c.arc(cx - 13, cy - 13, cx + 13, cy + 13, 30, 95)
-        c.line(cx + 11, cy + 7, cx + 13, cy + 12)
-    elif kind == "custom":
-        c.line(cx - 10, cy - 8, cx + 9, cy + 10)
-        c.circle(cx - 7, cy - 5, 3, fill=0, stroke=1)
-        c.rect(cx + 3, cy + 3, 7, 7, fill=0, stroke=1)
-    elif kind == "components":
-        c.circle(cx - 5, cy, 7, fill=0, stroke=1)
-        c.circle(cx - 5, cy, 3, fill=0, stroke=1)
-        c.rect(cx + 4, cy - 7, 7, 14, fill=0, stroke=1)
-    else:
-        c.line(cx - 9, cy + 8, cx + 9, cy - 8)
-        c.line(cx - 9, cy - 8, cx + 9, cy + 8)
-        c.circle(cx, cy, 4, fill=0, stroke=1)
+    c.translate(x + (size - draw_w) / 2, y + (size - draw_h) / 2)
+    c.scale(scale, scale)
+    renderPDF.draw(drawing, c, 0, 0)
     c.restoreState()
 
 
-def product_card(c, x, y, width, height, kind, title, body):
-    c.setFillColor(white)
-    c.setStrokeColor(LINE)
-    c.setLineWidth(0.8)
-    c.roundRect(x, y, width, height, 8, fill=1, stroke=1)
-    icon(c, kind, x + 30, y + height - 31)
-    paragraph(c, title, x + 55, y + height - 17, width - 67,
-              font="Segoe-Semibold", size=10.2, leading=12, color=BLACK)
-    paragraph(c, body, x + 55, y + height - 40, width - 67,
-              font="Segoe", size=7.7, leading=10, color=MID)
-
-
-def industry_chip(c, x, y, width, title, detail):
-    c.setFillColor(GRAPHITE)
-    c.setStrokeColor(HexColor("#474B55"))
-    c.roundRect(x, y, width, 46, 8, fill=1, stroke=1)
+def top_rule(c):
     c.setFillColor(RED)
-    c.circle(x + 18, y + 23, 4, fill=1, stroke=0)
-    paragraph(c, title, x + 30, y + 34, width - 39,
-              font="Segoe-Semibold", size=8.8, leading=10.5, color=white)
-    paragraph(c, detail, x + 30, y + 19, width - 39,
-              font="Segoe", size=6.8, leading=8, color=HexColor("#C9CBD1"))
+    c.rect(0, H - 7, W, 7, fill=1, stroke=0)
 
 
-def link_text(c, label, url, x, y, font="Segoe-Semibold", size=9, color=white):
+def page_footer(c, page_number, dark=False):
+    color = HexColor("#A7AAB2") if dark else MID
+    c.setFillColor(color)
+    c.setFont("Segoe", 6.5)
+    c.drawString(34, 19, "PARTS SEALS | VEDAÇÕES INDUSTRIAIS SOB MEDIDA")
+    c.drawRightString(W - 34, 19, f"{page_number:02d}")
+
+
+def link_text(c, label, url, x, y, font="Segoe-Semibold", size=8.5,
+              color=white):
     c.setFont(font, size)
     c.setFillColor(color)
     c.drawString(x, y, label)
@@ -155,284 +154,355 @@ def link_text(c, label, url, x, y, font="Segoe-Semibold", size=9, color=white):
     return width
 
 
+def link_button(c, label, url, x, y, width, height, fill=RED, text_color=white):
+    c.setFillColor(fill)
+    c.roundRect(x, y, width, height, height / 2, fill=1, stroke=0)
+    c.setFillColor(text_color)
+    c.setFont("Segoe-Semibold", 8.5)
+    c.drawCentredString(x + width / 2, y + height / 2 - 3, label)
+    c.linkURL(url, (x, y, x + width, y + height), relative=0)
+
+
+def dark_feature_card(c, x, y, width, height, icon_name, title, body):
+    c.setFillColor(GRAPHITE)
+    c.setStrokeColor(HexColor("#3B3E47"))
+    c.setLineWidth(0.7)
+    c.roundRect(x, y, width, height, 10, fill=1, stroke=1)
+    c.setFillColor(Color(0.76, 0.05, 0.09, alpha=0.14))
+    c.circle(x + 30, y + height - 31, 19, fill=1, stroke=0)
+    draw_svg(c, icon_name, x + 19, y + height - 42, 22, RED)
+    paragraph(c, title, x + 18, y + height - 61, width - 36,
+              font="Segoe-Semibold", size=9, leading=11, color=white)
+    paragraph(c, body, x + 18, y + height - 81, width - 36,
+              font="Segoe", size=6.8, leading=8.5, color=HexColor("#C9CBD1"))
+
+
+def solution_card(c, x, y, width, height, icon_name, title, body):
+    c.setFillColor(white)
+    c.setStrokeColor(LINE)
+    c.setLineWidth(0.8)
+    c.roundRect(x, y, width, height, 10, fill=1, stroke=1)
+    c.setFillColor(RED_LIGHT)
+    c.circle(x + 29, y + height - 29, 18, fill=1, stroke=0)
+    draw_svg(c, icon_name, x + 18, y + height - 40, 22, RED)
+    paragraph(c, title, x + 55, y + height - 18, width - 68,
+              font="Segoe-Semibold", size=9.3, leading=11.5, color=BLACK)
+    paragraph(c, body, x + 55, y + height - 43, width - 68,
+              font="Segoe", size=6.9, leading=8.7, color=MID)
+
+
+def photo_tile(c, image_path, x, y, width, height, label):
+    draw_rounded_image(c, image_path, x, y, width, height, radius=9)
+    c.saveState()
+    c.setFillColor(Color(0.02, 0.02, 0.03, alpha=0.68))
+    c.roundRect(x, y, width, 35, 9, fill=1, stroke=0)
+    c.rect(x, y + 15, width, 20, fill=1, stroke=0)
+    c.restoreState()
+    c.setFillColor(white)
+    c.setFont("Segoe-Semibold", 7.6)
+    c.drawString(x + 12, y + 13, label)
+
+
+def sector_pill(c, x, y, width, icon_name, label):
+    c.setFillColor(GRAPHITE_2)
+    c.setStrokeColor(HexColor("#484B55"))
+    c.setLineWidth(0.65)
+    c.roundRect(x, y, width, 34, 8, fill=1, stroke=1)
+    draw_svg(c, icon_name, x + 9, y + 8, 18, RED)
+    c.setFillColor(white)
+    c.setFont("Segoe-Semibold", 7.1)
+    c.drawString(x + 34, y + 12, label)
+
+
 def page_one(c):
-    hero_h = 322
-    draw_cover_image(c, HERO, 0, H - hero_h, W, hero_h)
+    c.setFillColor(CHARCOAL)
+    c.rect(0, 0, W, H, fill=1, stroke=0)
+    draw_cover_image(c, HERO, 0, H - 520, W, 520, focus_x=0.67, focus_y=0.5)
 
     c.saveState()
-    c.setFillColor(Color(0.02, 0.02, 0.03, alpha=0.63))
-    c.rect(0, H - hero_h, W, hero_h, fill=1, stroke=0)
+    c.setFillColor(Color(0.01, 0.01, 0.015, alpha=0.38))
+    c.rect(0, H - 520, W, 520, fill=1, stroke=0)
+    c.setFillColor(Color(0.01, 0.01, 0.015, alpha=0.76))
+    c.rect(0, H - 520, 315, 520, fill=1, stroke=0)
     c.restoreState()
 
-    c.setFillColor(RED)
-    c.rect(0, H - 7, W, 7, fill=1, stroke=0)
-    brand(c, 34, H - 48, dark=True)
+    top_rule(c)
+    draw_contain_image(c, LOGO_WHITE, 34, H - 91, 212, 62)
 
     c.setFillColor(RED)
-    c.roundRect(34, H - 95, 118, 22, 11, fill=1, stroke=0)
+    c.roundRect(34, H - 130, 137, 23, 11.5, fill=1, stroke=0)
     c.setFillColor(white)
-    c.setFont("Segoe-Semibold", 7.5)
-    c.drawCentredString(93, H - 88, "APRESENTAÇÃO COMERCIAL")
+    c.setFont("Segoe-Semibold", 7.2)
+    c.drawCentredString(102.5, H - 122, "APRESENTAÇÃO COMERCIAL | 2026")
 
     paragraph(
         c,
-        "Soluções em<br/><b>vedações industriais</b>",
+        "Vedações industriais<br/><b>sob medida</b> para<br/>quem não pode parar.",
         34,
-        H - 119,
-        330,
+        H - 165,
+        340,
         font="Segoe",
-        size=27,
-        leading=31,
+        size=25.5,
+        leading=29.5,
         color=white,
-    )
-    paragraph(
-        c,
-        "Engenharia, materiais de alto desempenho e fabricação sob medida para demandas que não cabem no catálogo.",
-        35,
-        H - 202,
-        305,
-        font="Segoe",
-        size=10.2,
-        leading=14,
-        color=HexColor("#E5E5E7"),
     )
     c.setStrokeColor(RED)
-    c.setLineWidth(3)
-    c.line(35, H - 265, 112, H - 265)
+    c.setLineWidth(3.2)
+    c.line(34, H - 280, 105, H - 280)
     paragraph(
         c,
-        "<b>Por desenho ou amostra.</b> Do item unitário às pequenas e médias séries.",
-        35,
-        H - 279,
-        310,
+        "Precisão, agilidade e materiais de alta performance para manutenção, reposição e aplicações críticas.",
+        34,
+        H - 299,
+        290,
         font="Segoe",
-        size=8.5,
-        leading=11,
-        color=white,
+        size=9.2,
+        leading=12.5,
+        color=HexColor("#E1E2E5"),
     )
 
-    content_top = H - hero_h - 25
-    paragraph(c, "Linhas que atendemos", 34, content_top, 300,
-              font="Segoe-Bold", size=18, leading=21, color=BLACK)
-    paragraph(
-        c,
-        "Portfólio técnico para complementar linhas padronizadas e resolver aplicações especiais.",
-        34,
-        content_top - 25,
-        500,
-        font="Segoe",
-        size=8.5,
-        leading=11,
-        color=MID,
-    )
+    c.setFillColor(CHARCOAL)
+    c.rect(0, 0, W, 325, fill=1, stroke=0)
+    c.setFillColor(RED)
+    c.rect(0, 320, W, 5, fill=1, stroke=0)
 
     cards = [
-        ("hydraulic", "Vedações hidráulicas",
-         "Gaxetas de haste e pistão • Raspadores • Anéis guia • Kits para cilindros"),
-        ("pneumatic", "Vedações pneumáticas",
-         "Baixo atrito • Atuadores • Gaxetas • Raspadores • Anéis guia"),
-        ("rotary", "Vedações rotativas",
-         "Retentores especiais • Anéis • Reposições industriais"),
-        ("custom", "Peças sob medida",
-         "Por desenho ou amostra • Fora de catálogo • Pequenas e médias séries"),
-        ("components", "Juntas e componentes",
-         "PTFE puro ou carregado • NBR • FKM • PU • Materiais técnicos"),
-        ("service", "Reposição e manutenção",
-         "Itens descontinuados • Urgências • Equipamentos antigos • Kits especiais"),
+        ("ruler-measure", "Fabricação sob medida",
+         "Por amostra, desenho, foto ou medidas da aplicação."),
+        ("microscope", "Atendimento técnico",
+         "Análise de geometria, material e condições de trabalho."),
+        ("bolt", "Agilidade no orçamento",
+         "Resposta objetiva para urgências e paradas de máquina."),
     ]
-    card_w, card_h = 255, 78
-    xs = [34, 306]
-    ys = [content_top - 122, content_top - 210, content_top - 298]
-    for index, (kind, title, body) in enumerate(cards):
-        product_card(c, xs[index % 2], ys[index // 2], card_w, card_h, kind, title, body)
+    for index, card in enumerate(cards):
+        dark_feature_card(c, 34 + index * 176, 196, 160, 106, *card)
 
-    c.setFillColor(LIGHT)
-    c.roundRect(34, 58, W - 68, 91, 10, fill=1, stroke=0)
-    paragraph(c, "Por que Parts Seals", 49, 132, 180,
-              font="Segoe-Bold", size=10.5, leading=13, color=BLACK)
-    differentiators = [
-        ("Análise personalizada", "A aplicação vem antes da escolha do material."),
-        ("Alta performance", "Componentes definidos para as condições reais de trabalho."),
-        ("Agilidade e flexibilidade", "Apoio a urgências, reposições e séries especiais."),
-    ]
-    for index, (title, detail) in enumerate(differentiators):
-        x = 49 + index * 171
-        c.setFillColor(RED)
-        c.circle(x + 4, 101, 4, fill=1, stroke=0)
-        paragraph(c, title, x + 14, 116, 145, font="Segoe-Semibold",
-                  size=7.7, leading=9.5, color=RED_DARK)
-        paragraph(c, detail, x + 14, 98, 145, font="Segoe",
-                  size=6.7, leading=8.2, color=MID)
-
-    c.setFillColor(RED)
-    c.rect(0, 0, W, 36, fill=1, stroke=0)
-    c.setFillColor(white)
-    c.setFont("Segoe-Semibold", 8.5)
-    c.drawString(34, 13, "PARTS SEALS | ENGENHARIA E TECNOLOGIA EM VEDAÇÃO")
-    link_text(c, "parts-seals.com.br", "https://parts-seals.com.br", 448, 13,
-              font="Segoe-Semibold", size=8.5, color=white)
+    c.setFillColor(GRAPHITE)
+    c.roundRect(34, 50, W - 68, 121, 12, fill=1, stroke=0)
+    paragraph(c, "Da necessidade à peça pronta.", 52, 147, 310,
+              font="Segoe-Bold", size=15, leading=18, color=white)
+    paragraph(
+        c,
+        "Envie uma amostra, desenho ou dados técnicos. Nossa equipe avalia a solução e orienta o próximo passo.",
+        52,
+        122,
+        315,
+        font="Segoe",
+        size=7.8,
+        leading=10.4,
+        color=HexColor("#C9CBD1"),
+    )
+    link_button(c, "FALAR COM UM ESPECIALISTA", "https://wa.me/5519983011817",
+                388, 103, 153, 34)
+    link_text(c, "vendas@parts-seals.com.br", "mailto:vendas@parts-seals.com.br",
+              388, 76, size=7.4, color=HexColor("#E6E7E9"))
+    page_footer(c, 1, dark=True)
 
 
 def page_two(c):
     c.setFillColor(white)
     c.rect(0, 0, W, H, fill=1, stroke=0)
-    c.setFillColor(RED)
-    c.rect(0, H - 7, W, 7, fill=1, stroke=0)
-    brand(c, 34, H - 45, dark=False)
+    top_rule(c)
+    draw_contain_image(c, LOGO_DARK, 34, H - 77, 165, 42)
 
-    paragraph(c, "Da aplicação à solução", 34, H - 88, 360,
-              font="Segoe-Bold", size=20, leading=24, color=BLACK)
+    paragraph(c, "Linhas e soluções", 34, H - 104, 270,
+              font="Segoe-Bold", size=21, leading=25, color=BLACK)
     paragraph(
         c,
-        "Cada vedação é definida a partir das condições reais de trabalho.",
+        "Portfólio técnico para complementar itens padronizados e desenvolver peças especiais.",
         34,
-        H - 116,
+        H - 132,
+        470,
+        font="Segoe",
+        size=8.6,
+        leading=11.5,
+        color=MID,
+    )
+
+    photo_tile(c, PHOTO_COMPONENTS, 34, H - 318, 166, 145,
+               "Gaxetas, anéis e raspadores")
+    photo_tile(c, PHOTO_GUIDES, 215, H - 318, 166, 145,
+               "Anéis guia e componentes")
+    photo_tile(c, PHOTO_CUSTOM, 396, H - 318, 165, 145,
+               "Peças técnicas sob medida")
+
+    solutions = [
+        ("droplet", "Vedações hidráulicas",
+         "Gaxetas de haste e pistão, raspadores, anéis guia e kits para cilindros."),
+        ("wind", "Vedações pneumáticas",
+         "Perfis de baixo atrito, atuadores, gaxetas, raspadores e guias."),
+        ("rotate-clockwise-2", "Vedações rotativas",
+         "Retentores especiais, anéis e reposições para conjuntos rotativos."),
+        ("ruler-measure", "Peças sob medida",
+         "Fabricação por desenho ou amostra, inclusive medidas fora de catálogo."),
+        ("circles-relation", "Perfis DP, DH e back-up",
+         "PTFE puro ou carregado, PU e outros materiais conforme aplicação."),
+        ("tool", "Reposição e manutenção",
+         "Itens descontinuados, equipamentos antigos, urgências e kits especiais."),
+    ]
+    card_w, card_h = 255, 86
+    xs = [34, 306]
+    ys = [H - 438, H - 534, H - 630]
+    for index, item in enumerate(solutions):
+        solution_card(c, xs[index % 2], ys[index // 2],
+                      card_w, card_h, *item)
+
+    c.setFillColor(CHARCOAL)
+    c.roundRect(34, 48, W - 68, 142, 12, fill=1, stroke=0)
+    paragraph(c, "Materiais de alta performance", 52, 166, 300,
+              font="Segoe-Bold", size=12.5, leading=15, color=white)
+    paragraph(
+        c,
+        "A especificação considera pressão, temperatura, fluido, movimento, desgaste e condições do equipamento.",
+        52,
+        145,
         480,
         font="Segoe",
-        size=9,
-        leading=12,
-        color=MID,
-    )
-
-    process = [
-        ("01", "Entendimento", "Pressão, temperatura,<br/>fluido e velocidade"),
-        ("02", "Engenharia", "Desenho ou amostra,<br/>alojamento e tolerâncias"),
-        ("03", "Material", "Polímero ou elastômero<br/>adequado à aplicação"),
-        ("04", "Entrega", "Peças especiais, séries<br/>e reposições"),
-    ]
-    node_y = H - 184
-    c.setStrokeColor(LINE)
-    c.setLineWidth(2)
-    c.line(76, node_y + 19, 511, node_y + 19)
-    for index, (number, title, detail) in enumerate(process):
-        x = 34 + index * 137
-        c.setFillColor(RED)
-        c.circle(x + 18, node_y + 19, 18, fill=1, stroke=0)
-        c.setFillColor(white)
-        c.setFont("Segoe-Bold", 9)
-        c.drawCentredString(x + 18, node_y + 16, number)
-        paragraph(c, title, x, node_y - 10, 120, font="Segoe-Semibold",
-                  size=8.8, leading=11, color=BLACK)
-        paragraph(c, detail, x, node_y - 27, 120, font="Segoe",
-                  size=6.9, leading=8.5, color=MID)
-
-    panel_y, panel_h = H - 465, 185
-    c.setFillColor(CHARCOAL)
-    c.roundRect(24, panel_y, W - 48, panel_h, 12, fill=1, stroke=0)
-    paragraph(c, "Setores atendidos", 42, panel_y + panel_h - 25, 250,
-              font="Segoe-Bold", size=15, leading=18, color=white)
-    paragraph(
-        c,
-        "Soluções para ambientes produtivos que exigem confiabilidade, compatibilidade química e desempenho.",
-        42,
-        panel_y + panel_h - 49,
-        495,
-        font="Segoe",
-        size=7.8,
-        leading=10,
+        size=7.2,
+        leading=9.2,
         color=HexColor("#C9CBD1"),
     )
-    industries = [
-        ("Metalmecânico", "Máquinas e linhas produtivas"),
-        ("Automotivo", "Componentes e manutenção"),
-        ("Alimentos e farmacêutico", "Processos e utilidades"),
-        ("Óleo, gás e químico", "Fluidos e condições severas"),
-        ("Energia e mineração", "Equipamentos críticos"),
-        ("Manutenção industrial", "Reposições e reformas"),
-    ]
-    chip_w = 160
-    for index, (title, detail) in enumerate(industries):
-        col = index % 3
-        row = index // 3
-        industry_chip(c, 42 + col * 171, panel_y + 63 - row * 56,
-                      chip_w, title, detail)
-
-    materials_top = panel_y - 24
-    paragraph(c, "Materiais e compostos", 34, materials_top, 250,
-              font="Segoe-Bold", size=15, leading=18, color=BLACK)
+    materials = ["PU", "PTFE", "NBR", "FKM", "POM", "PEEK", "NYLON", "CELERON"]
+    for index, label in enumerate(materials):
+        x = 52 + index * 61
+        c.setFillColor(RED if index < 4 else GRAPHITE_2)
+        c.roundRect(x, 93, 52, 25, 12.5, fill=1, stroke=0)
+        c.setFillColor(white)
+        c.setFont("Segoe-Semibold", 6.8)
+        c.drawCentredString(x + 26, 102, label)
     paragraph(
         c,
-        "A seleção final considera todos os dados técnicos da aplicação.",
-        34,
-        materials_top - 21,
-        400,
+        "PTFE com bronze, molibdênio, grafite e outras cargas técnicas.",
+        52,
+        77,
+        470,
         font="Segoe",
-        size=7.6,
-        leading=10,
+        size=6.8,
+        leading=8.5,
+        color=HexColor("#E0E1E4"),
+    )
+    page_footer(c, 2, dark=False)
+
+
+def page_three(c):
+    c.setFillColor(white)
+    c.rect(0, 0, W, H, fill=1, stroke=0)
+    top_rule(c)
+    draw_contain_image(c, LOGO_DARK, 34, H - 77, 165, 42)
+
+    paragraph(c, "Atendimento para operações contínuas", 34, H - 105, 480,
+              font="Segoe-Bold", size=19, leading=23, color=BLACK)
+    paragraph(
+        c,
+        "Da indústria de processo à manutenção pesada, apoiamos equipes técnicas na reposição e no desenvolvimento de vedações.",
+        34,
+        H - 132,
+        500,
+        font="Segoe",
+        size=8.4,
+        leading=11.2,
         color=MID,
     )
 
-    c.setFillColor(LIGHT)
-    c.roundRect(34, materials_top - 118, 330, 84, 8, fill=1, stroke=0)
-    paragraph(c, "Polímeros e elastômeros", 48, materials_top - 47, 210,
-              font="Segoe-Semibold", size=9, leading=11, color=RED_DARK)
+    panel_y, panel_h = H - 480, 300
+    c.setFillColor(CHARCOAL)
+    c.roundRect(24, panel_y, W - 48, panel_h, 13, fill=1, stroke=0)
+    paragraph(c, "Setores e linhas atendidas", 42, panel_y + panel_h - 27, 290,
+              font="Segoe-Bold", size=14.5, leading=18, color=white)
     paragraph(
         c,
-        "NBR • FKM / Viton • PU • PTFE • Nylon • PEEK<br/>"
-        "Poliacetal • UHMW • Silicone • EPDM • Celeron",
-        48,
-        materials_top - 68,
-        295,
+        "Soluções para ambientes que exigem precisão, confiabilidade e resposta rápida.",
+        42,
+        panel_y + panel_h - 50,
+        460,
         font="Segoe",
-        size=7.8,
-        leading=11,
-        color=BLACK,
+        size=7.4,
+        leading=9.5,
+        color=HexColor("#C9CBD1"),
     )
+    sectors = [
+        ("home", "Linha branca"),
+        ("droplet", "Óleo e gás"),
+        ("chef-hat", "Alimentícia"),
+        ("pill", "Farmacêutica"),
+        ("building-factory-2", "Mineração"),
+        ("building", "Construção"),
+        ("tractor", "Máquinas agrícolas"),
+        ("building-factory-2", "Metalurgia"),
+        ("leaf", "Papel e celulose"),
+        ("tools", "Manutenção industrial"),
+        ("droplet", "Hidráulica"),
+        ("wind", "Pneumática"),
+        ("truck", "Linha amarela"),
+        ("tractor", "Linha verde"),
+    ]
+    pill_w = 160
+    for index, (icon_name, label) in enumerate(sectors):
+        col = index % 3
+        row = index // 3
+        sector_pill(c, 42 + col * 171, panel_y + 188 - row * 44,
+                    pill_w, icon_name, label)
 
-    c.setFillColor(RED_LIGHT)
-    c.roundRect(376, materials_top - 118, 185, 84, 8, fill=1, stroke=0)
-    paragraph(c, "Compostos para PTFE", 390, materials_top - 47, 155,
-              font="Segoe-Semibold", size=9, leading=11, color=RED_DARK)
-    paragraph(
-        c,
-        "Bronze • Carbono • Fibra de vidro<br/>"
-        "Grafite • Molibdênio • T-46",
-        390,
-        materials_top - 68,
-        150,
-        font="Segoe",
-        size=7.8,
-        leading=11,
-        color=BLACK,
-    )
+    paragraph(c, "Um fluxo claro, do briefing à entrega", 34, panel_y - 30, 390,
+              font="Segoe-Bold", size=13.5, leading=17, color=BLACK)
+    steps = [
+        ("file-upload", "Você envia", "Amostra, foto,<br/>medidas ou desenho"),
+        ("microscope", "Analisamos", "Aplicação, geometria,<br/>material e urgência"),
+        ("settings-code", "Desenvolvemos", "Perfil, tolerâncias<br/>e especificação"),
+        ("tool", "Produzimos", "Precisão e qualidade<br/>dimensional"),
+        ("package", "Entregamos", "Pronto para apoiar<br/>sua operação"),
+    ]
+    line_y = panel_y - 100
+    c.setStrokeColor(LINE)
+    c.setLineWidth(2)
+    c.line(71, line_y + 17, 520, line_y + 17)
+    for index, (icon_name, title, body) in enumerate(steps):
+        x = 34 + index * 105
+        c.setFillColor(RED)
+        c.circle(x + 17, line_y + 17, 17, fill=1, stroke=0)
+        draw_svg(c, icon_name, x + 8, line_y + 8, 18, white)
+        paragraph(c, title, x, line_y - 12, 95,
+                  font="Segoe-Semibold", size=7.6, leading=9.5, color=BLACK)
+        paragraph(c, body, x, line_y - 30, 95,
+                  font="Segoe", size=6.2, leading=7.5, color=MID)
 
     c.setFillColor(RED)
-    c.roundRect(24, 42, W - 48, 120, 12, fill=1, stroke=0)
-    paragraph(c, "Vamos avaliar uma aplicação real?", 42, 142, 300,
+    c.roundRect(24, 42, W - 48, 132, 12, fill=1, stroke=0)
+    paragraph(c, "Vamos avaliar uma aplicação real?", 42, 151, 320,
               font="Segoe-Bold", size=15, leading=18, color=white)
     paragraph(
         c,
         "Envie um desenho, uma amostra ou os dados de trabalho. Nossa equipe retorna com a análise inicial.",
         42,
-        119,
-        500,
+        128,
+        470,
         font="Segoe",
-        size=8,
-        leading=10.5,
+        size=7.7,
+        leading=10,
         color=HexColor("#FBEDEE"),
     )
-    link_text(c, "(19) 3626-3552", "tel:+551936263552", 42, 80, size=8.4)
+    link_text(c, "(19) 3626-3552", "tel:+551936263552", 42, 91, size=8.1)
     link_text(c, "WhatsApp: (19) 98301-1817", "https://wa.me/5519983011817",
-              147, 80, size=8.4)
+              145, 91, size=8.1)
     link_text(c, "vendas@parts-seals.com.br", "mailto:vendas@parts-seals.com.br",
-              313, 80, size=8.4)
+              309, 91, size=8.1)
     link_text(c, "parts-seals.com.br", "https://parts-seals.com.br",
-              42, 59, size=8.4)
+              42, 66, size=8.1)
     paragraph(
         c,
-        "Rua José Adhemar Petrini, 60 - Parque Industrial Bandeirantes - Santa Bárbara d'Oeste/SP - CEP 13457-174",
-        170,
-        66,
-        370,
+        "R. José Adhemar Petrini, 60 - Pq. Ind. Bandeirantes - Santa Bárbara d'Oeste/SP - CEP 13457-174",
+        171,
+        73,
+        360,
         font="Segoe",
-        size=6.8,
+        size=6.6,
         leading=8,
         color=HexColor("#FBEDEE"),
     )
-
     c.setFillColor(MID)
-    c.setFont("Segoe", 6.5)
-    c.drawString(34, 21, "CNPJ 30.705.918/0001-05  |  I.E. 606.270.534.118  |  © 2026 Parts Seals")
+    c.setFont("Segoe", 6.3)
+    c.drawString(34, 20, "CNPJ 30.705.918/0001-05  |  I.E. 606.270.534.118  |  © 2026 Parts Seals")
+    c.drawRightString(W - 34, 20, "03")
 
 
 def generate():
@@ -440,10 +510,13 @@ def generate():
     c = canvas.Canvas(str(OUTPUT), pagesize=A4, pageCompression=1)
     c.setTitle("Apresentação Comercial Parts Seals")
     c.setAuthor("Parts Seals Vedações Industriais")
-    c.setSubject("Linhas, materiais e aplicações atendidas")
+    c.setSubject("Linhas, setores, materiais e soluções de vedação industrial")
+    c.setKeywords("vedações industriais, peças sob medida, hidráulica, pneumática, PTFE")
     page_one(c)
     c.showPage()
     page_two(c)
+    c.showPage()
+    page_three(c)
     c.showPage()
     c.save()
     print(OUTPUT)
