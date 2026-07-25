@@ -44,6 +44,10 @@ DOMAIN_AUTH_CONFIRMED=false
 6. Execute `iniciar.bat`.
 7. Abra `http://localhost:3210`.
 
+O `iniciar.bat` verifica as dependências, inicia o servidor em segundo plano e
+abre o painel automaticamente no navegador. Se o servidor já estiver ativo, ele
+apenas abre o painel novamente.
+
 ## Fluxo recomendado
 
 ### 1. Modo seguro
