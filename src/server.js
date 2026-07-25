@@ -1,12 +1,11 @@
 import path from 'node:path';
 import express from 'express';
 import { config, publicConfig, validateLiveSending } from './config.js';
-import { addEvent, addLead, getLead, getState, loadState, nextLeadId, resetFromWorkbook, saveState, updateLead } from './store.js';
+import { addEvent, getLead, getState, loadState, resetFromWorkbook, saveState, updateLead } from './store.js';
 import { activateCampaign, limitStatus, pauseCampaign, processNext, startScheduler } from './scheduler.js';
 import { sendLeadEmail, verifySmtp } from './mailer.js';
 import { syncInbox } from './inbox.js';
 import { researchLead } from './research.js';
-import { discoverLeads, discoveredLead, hasMx, isCorporateEmail } from './discovery.js';
 import { exportCsv, stateKpis, stats } from './reporting.js';
 
 await loadState();
@@ -211,29 +210,6 @@ app.post('/api/leads/:id/apply-research', asyncRoute(async (req, res) => {
   addEvent('lead.research.applied', { leadId: lead.id, company: lead.company });
   await saveState();
   res.json(getLead(lead.id));
-}));
-
-app.post('/api/discovery/search', asyncRoute(async (req, res) => {
-  const existingEmails = getState().leads.map((lead) => lead.email);
-  const result = await discoverLeads({ ...req.body, existingEmails });
-  addEvent('discovery.completed', { uf: result.uf, found: result.found });
-  await saveState();
-  res.json(result);
-}));
-
-app.post('/api/discovery/import', asyncRoute(async (req, res) => {
-  const candidate = req.body.candidate || {};
-  const email = String(candidate.email || '').trim().toLowerCase();
-  const existing = getState().leads.find((lead) => lead.email && lead.email === email);
-  if (existing) return res.status(409).json({ error: `Este e-mail já está na fila: ${existing.company}.` });
-  if (!isCorporateEmail(email) || !candidate.emailSource || !candidate.companySource || !await hasMx(email)) {
-    return res.status(400).json({ error: 'O contato não passou novamente pela validação obrigatória.' });
-  }
-  const lead = discoveredLead(candidate, nextLeadId());
-  addLead(lead);
-  addEvent('discovery.imported', { leadId: lead.id, company: lead.company, uf: lead.uf });
-  await saveState();
-  res.status(201).json(lead);
 }));
 
 app.post('/api/reload-workbook', asyncRoute(async (req, res) => {

@@ -18,7 +18,6 @@ Pacote preparado para transformar a planilha comercial em uma fila segura de pro
 - Pesquisa web opcional com OpenAI, mantendo a revisão humana antes de usar os resultados.
 - Funil comercial com taxas de resposta, interesse, rejeição, opt-out e entregabilidade.
 - KPIs por estado para comparar resultados de cada UF.
-- Descoberta de novos leads por estado, com fonte pública, domínio corporativo e MX validados.
 - Verificador básico de MX, SPF, DKIM e DMARC.
 
 ## Estrutura
@@ -125,19 +124,6 @@ Com `OPENAI_API_KEY` preenchida, o botão **Pesquisar empresa** usa web search p
 - riscos de homônimo ou informação incerta.
 
 A pesquisa nunca aprova nem envia automaticamente. O resultado aparece no painel para revisão. Quando retornar textos estruturados, use **Aplicar texto pesquisado**; o lead continuará sem aprovação até nova conferência humana.
-
-Na seção **Descoberta de leads por estado**, selecione a UF, informe opcionalmente
-um segmento e escolha a quantidade. O sistema:
-
-- pesquisa empresas e contatos corporativos publicados em fontes públicas;
-- descarta e-mails pessoais, duplicados, sem fonte ou sem registro MX;
-- mostra as fontes para conferência;
-- só adiciona o candidato à fila quando você clicar em **Adicionar à fila**;
-- mantém o novo lead sem aprovação até a revisão do texto e das fontes.
-
-MX e formato válidos não garantem a existência ou aceitação de uma caixa postal
-específica. A validação definitiva ocorre com o resultado do envio e o tratamento
-de bounces.
 
 As respostas sincronizadas por IMAP entram como **A classificar**. Abra o lead e
 marque **Interessado**, **Não interessado**, **Contato futuro** ou **Opt-out** para
