@@ -4,7 +4,8 @@ Pacote preparado para transformar a planilha comercial em uma fila segura de pro
 
 ## O que já está pronto
 
-- Planilha `data/campanha.xlsx` com os 251 cadastros originais preservados.
+- Planilha histórica `data/campanha.xlsx` com os 251 cadastros originais preservados.
+- Campanha ativa com 1.000 contatos aptos: 119 originais e 881 novos estabelecimentos ativos.
 - 251 conjuntos de assunto, e-mail inicial e dois follow-ups personalizados por empresa, segmento e contexto regional.
 - 119 empresas com e-mail na fila; 132 permanecem bloqueadas por ausência de e-mail público confiável.
 - Classificação de confiança: 82 altas, 37 moderadas e 132 baixas/sem e-mail.
@@ -19,6 +20,30 @@ Pacote preparado para transformar a planilha comercial em uma fila segura de pro
 - Funil comercial com taxas de resposta, interesse, rejeição, opt-out e entregabilidade.
 - KPIs por estado para comparar resultados de cada UF.
 - Verificador básico de MX, SPF, DKIM e DMARC.
+
+## Base validada de 1.000 contatos
+
+Os 881 novos contatos estão no arquivo versionado
+`data/leads-rfb-2026-07-12.json` e são combinados automaticamente aos 119
+contatos aptos da planilha histórica. Na primeira inicialização após uma nova
+versão da base, os cadastros antigos sem e-mail ficam fora da campanha ativa,
+mas continuam preservados em `data/campanha.xlsx`.
+
+Critérios aplicados aos novos registros:
+
+- estabelecimento com situação ativa na Receita Federal;
+- CNAE ligado a máquinas, manutenção, componentes ou fornecimento industrial;
+- matriz com nome fantasia e e-mail em domínio próprio;
+- registro MX válido no domínio do e-mail;
+- remoção de duplicidades e contatos aparentando pertencer a escritórios contábeis;
+- cobertura de 23 unidades federativas; AC, AP, PI e RR ficaram sem contato que
+  passasse por todos os critérios, evitando preencher a base com caixas de
+  financeiro, emissão de notas ou escritórios contábeis.
+
+Fonte: Dados Abertos do CNPJ da Receita Federal, snapshot de 12/07/2026,
+espelhado em `https://dados-abertos-rf-cnpj.casadosdados.com.br/arquivos/2026-07-12/`.
+Registro MX não garante que uma caixa individual aceitará a mensagem; bounces
+continuam sendo tratados pelo sistema e removem o contato da sequência.
 
 ## Estrutura
 

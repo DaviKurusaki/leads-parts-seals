@@ -6,6 +6,36 @@ import { readCampaignWorkbook } from './workbook.js';
 let state = null;
 let writeChain = Promise.resolve();
 
+async function readLeadSeed() {
+  try {
+    return JSON.parse(await fs.readFile(config.leadSeedFile, 'utf8'));
+  } catch (error) {
+    if (error.code === 'ENOENT') return null;
+    throw error;
+  }
+}
+
+async function applyLeadSeed(currentState) {
+  const seed = await readLeadSeed();
+  if (!seed?.leads?.length || currentState.leadSeedVersion === seed.version) return false;
+  const preserved = currentState.leads.filter((lead) => (
+    lead.sourceType !== 'rfb-open-data'
+    && lead.canSend
+    && lead.email
+  ));
+  const existingEmails = new Set(preserved.map((lead) => lead.email.toLowerCase()));
+  const additions = seed.leads.filter((lead) => !existingEmails.has(lead.email.toLowerCase()));
+  currentState.leads = [...preserved, ...additions];
+  currentState.leadSeedVersion = seed.version;
+  addEvent('leads.seedApplied', {
+    source: seed.source,
+    preserved: preserved.length,
+    additions: additions.length,
+    total: currentState.leads.length,
+  });
+  return true;
+}
+
 function initialState(leads) {
   return {
     version: 1,
@@ -45,6 +75,7 @@ export async function loadState() {
     state = initialState(leads);
     await saveState();
   }
+  if (await applyLeadSeed(state)) await saveState();
   return state;
 }
 
@@ -74,6 +105,7 @@ export function addEvent(type, details = {}) {
 export async function resetFromWorkbook() {
   const leads = await readCampaignWorkbook();
   state = initialState(leads);
+  await applyLeadSeed(state);
   await saveState();
   return state;
 }

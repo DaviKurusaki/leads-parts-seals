@@ -17,6 +17,7 @@ export const config = Object.freeze({
   timezone: process.env.TIMEZONE || 'America/Sao_Paulo',
   workbookPath: path.resolve(process.env.DATA_WORKBOOK || './data/campanha.xlsx'),
   stateFile: path.resolve(process.env.STATE_FILE || './data/state.json'),
+  leadSeedFile: path.resolve(process.env.LEAD_SEED_FILE || './data/leads-rfb-2026-07-12.json'),
   sendMode: (process.env.SEND_MODE || 'dry-run').toLowerCase(),
   domainAuthConfirmed: boolEnv('DOMAIN_AUTH_CONFIRMED', false),
 
