@@ -19,6 +19,59 @@
   <main>
     <section class="stats" id="stats"></section>
 
+    <section class="panel">
+      <div class="panel-title">
+        <div>
+          <div class="eyebrow red">DESEMPENHO COMERCIAL</div>
+          <h2>Funil de respostas</h2>
+          <p>Taxas calculadas sobre os envios e respostas já registrados.</p>
+        </div>
+      </div>
+      <div class="funnel-stats" id="funnelStats"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-title">
+        <div>
+          <div class="eyebrow red">VISÃO GEOGRÁFICA</div>
+          <h2>KPIs por estado</h2>
+          <p>Compare resposta, interesse, rejeição e opt-out por UF.</p>
+        </div>
+        <select id="stateKpiFilter" aria-label="Filtrar indicadores por estado">
+          <option value="">Todos os estados</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table class="state-table">
+          <thead><tr>
+            <th>UF</th><th>Leads</th><th>Enviados</th><th>Respostas</th><th>Taxa resp.</th>
+            <th>Interessados</th><th>Não interessados</th><th>Não quer receber</th><th>Bounces</th>
+          </tr></thead>
+          <tbody id="stateKpiRows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel discovery-panel">
+      <div class="panel-title">
+        <div>
+          <div class="eyebrow red">NOVOS CLIENTES</div>
+          <h2>Descoberta de leads por estado</h2>
+          <p>Pesquisa empresas na web e mantém somente e-mails corporativos públicos com domínio de recebimento válido.</p>
+        </div>
+        <span id="discoveryBadge" class="badge neutral">Verificando...</span>
+      </div>
+      <div class="discovery-form">
+        <label>Estado<select id="discoveryUf"></select></label>
+        <label>Segmento desejado<input id="discoverySegment" placeholder="Ex.: manutenção industrial, hidráulica"></label>
+        <label>Quantidade<select id="discoveryLimit"><option>5</option><option selected>10</option><option>15</option><option>20</option></select></label>
+        <button id="discoverLeads" class="primary">Buscar novos clientes</button>
+      </div>
+      <div class="discovery-note">Todo resultado exige revisão e aprovação manual antes de entrar em uma campanha. A validação não garante que a caixa individual aceitará mensagens.</div>
+      <div id="discoveryStatus" class="message hidden"></div>
+      <div id="discoveryResults" class="discovery-results"></div>
+    </section>
+
     <section class="panel controls">
       <div class="panel-title">
         <div>
@@ -100,6 +153,17 @@
           <label>E-mail inicial<textarea id="editInitial" rows="15"></textarea></label>
           <label>Follow-up 1<textarea id="editFollow1" rows="9"></textarea></label>
           <label>Follow-up 2<textarea id="editFollow2" rows="9"></textarea></label>
+          <label>Classificação da resposta
+            <select id="editResponseClass">
+              <option value="">Sem resposta</option>
+              <option>A classificar</option>
+              <option>Interessado</option>
+              <option>Não interessado</option>
+              <option>Contato futuro</option>
+              <option>Opt-out</option>
+            </select>
+          </label>
+          <label>Resposta recebida<textarea id="editResponse" rows="5" readonly></textarea></label>
           <label>Observações<textarea id="editNotes" rows="4"></textarea></label>
         </div>
         <aside>

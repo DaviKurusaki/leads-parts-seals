@@ -75,6 +75,7 @@ export function publicConfig() {
     senderSite: config.senderSite,
     imapEnabled: config.imap.enabled,
     researchEnabled: Boolean(config.openaiApiKey),
+    discoveryEnabled: Boolean(config.openaiApiKey),
     limits: config.limits,
   };
 }

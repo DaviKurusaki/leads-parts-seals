@@ -64,6 +64,17 @@ export function updateLead(id, patch) {
   return lead;
 }
 
+export function addLead(lead) {
+  const duplicate = getState().leads.find((item) => item.email && item.email === lead.email);
+  if (duplicate) throw new Error(`Este e-mail já pertence ao lead ${duplicate.company}.`);
+  getState().leads.push(lead);
+  return lead;
+}
+
+export function nextLeadId() {
+  return Math.max(0, ...getState().leads.map((lead) => Number(lead.id) || 0)) + 1;
+}
+
 export function addEvent(type, details = {}) {
   const event = { id: crypto.randomUUID(), type, at: new Date().toISOString(), ...details };
   getState().events.unshift(event);

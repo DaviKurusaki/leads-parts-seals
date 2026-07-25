@@ -1,12 +1,13 @@
 import path from 'node:path';
 import express from 'express';
 import { config, publicConfig, validateLiveSending } from './config.js';
-import { addEvent, getLead, getState, loadState, resetFromWorkbook, saveState, updateLead } from './store.js';
+import { addEvent, addLead, getLead, getState, loadState, nextLeadId, resetFromWorkbook, saveState, updateLead } from './store.js';
 import { activateCampaign, limitStatus, pauseCampaign, processNext, startScheduler } from './scheduler.js';
 import { sendLeadEmail, verifySmtp } from './mailer.js';
 import { syncInbox } from './inbox.js';
 import { researchLead } from './research.js';
-import { exportCsv, stats } from './reporting.js';
+import { discoverLeads, discoveredLead, hasMx, isCorporateEmail } from './discovery.js';
+import { exportCsv, stateKpis, stats } from './reporting.js';
 
 await loadState();
 startScheduler();
@@ -29,6 +30,7 @@ function leadOr404(req, res) {
 
 app.get('/api/config', (_req, res) => res.json(publicConfig()));
 app.get('/api/stats', (_req, res) => res.json({ ...stats(), limits: limitStatus() }));
+app.get('/api/kpis/states', (_req, res) => res.json(stateKpis()));
 app.get('/api/events', (req, res) => {
   const limit = Math.min(Number(req.query.limit) || 100, 500);
   res.json(getState().events.slice(0, limit));
@@ -69,6 +71,17 @@ app.patch('/api/leads/:id', asyncRoute(async (req, res) => {
   ];
   const patch = {};
   for (const key of allowed) if (Object.hasOwn(req.body, key)) patch[key] = req.body[key];
+  if (Object.hasOwn(patch, 'responseClass') && patch.responseClass) {
+    patch.replied = true;
+    patch.paused = true;
+    if (patch.responseClass === 'Opt-out') {
+      patch.optedOut = true;
+      patch.approved = false;
+      patch.campaignStatus = 'Opt-out';
+    } else {
+      patch.campaignStatus = 'Respondeu';
+    }
+  }
   const updated = updateLead(lead.id, patch);
   addEvent('lead.updated', { leadId: lead.id, fields: Object.keys(patch) });
   await saveState();
@@ -198,6 +211,29 @@ app.post('/api/leads/:id/apply-research', asyncRoute(async (req, res) => {
   addEvent('lead.research.applied', { leadId: lead.id, company: lead.company });
   await saveState();
   res.json(getLead(lead.id));
+}));
+
+app.post('/api/discovery/search', asyncRoute(async (req, res) => {
+  const existingEmails = getState().leads.map((lead) => lead.email);
+  const result = await discoverLeads({ ...req.body, existingEmails });
+  addEvent('discovery.completed', { uf: result.uf, found: result.found });
+  await saveState();
+  res.json(result);
+}));
+
+app.post('/api/discovery/import', asyncRoute(async (req, res) => {
+  const candidate = req.body.candidate || {};
+  const email = String(candidate.email || '').trim().toLowerCase();
+  const existing = getState().leads.find((lead) => lead.email && lead.email === email);
+  if (existing) return res.status(409).json({ error: `Este e-mail já está na fila: ${existing.company}.` });
+  if (!isCorporateEmail(email) || !candidate.emailSource || !candidate.companySource || !await hasMx(email)) {
+    return res.status(400).json({ error: 'O contato não passou novamente pela validação obrigatória.' });
+  }
+  const lead = discoveredLead(candidate, nextLeadId());
+  addLead(lead);
+  addEvent('discovery.imported', { leadId: lead.id, company: lead.company, uf: lead.uf });
+  await saveState();
+  res.status(201).json(lead);
 }));
 
 app.post('/api/reload-workbook', asyncRoute(async (req, res) => {

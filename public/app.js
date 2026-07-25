@@ -4,6 +4,17 @@ let total = 0;
 let pageSize = 25;
 let currentLead = null;
 let appConfig = null;
+let stateKpiData = [];
+
+const UFS = [
+  ['AC', 'Acre'], ['AL', 'Alagoas'], ['AP', 'Amapá'], ['AM', 'Amazonas'], ['BA', 'Bahia'],
+  ['CE', 'Ceará'], ['DF', 'Distrito Federal'], ['ES', 'Espírito Santo'], ['GO', 'Goiás'],
+  ['MA', 'Maranhão'], ['MT', 'Mato Grosso'], ['MS', 'Mato Grosso do Sul'], ['MG', 'Minas Gerais'],
+  ['PA', 'Pará'], ['PB', 'Paraíba'], ['PR', 'Paraná'], ['PE', 'Pernambuco'], ['PI', 'Piauí'],
+  ['RJ', 'Rio de Janeiro'], ['RN', 'Rio Grande do Norte'], ['RS', 'Rio Grande do Sul'],
+  ['RO', 'Rondônia'], ['RR', 'Roraima'], ['SC', 'Santa Catarina'], ['SP', 'São Paulo'],
+  ['SE', 'Sergipe'], ['TO', 'Tocantins'],
+];
 
 async function api(url, options = {}) {
   const response = await fetch(url, {
@@ -48,6 +59,11 @@ async function loadConfig() {
   const live = appConfig.sendMode === 'live';
   $('#modeBadge').textContent = live ? 'ENVIO AO VIVO' : 'MODO SEGURO — DRY RUN';
   $('#modeBadge').style.background = live ? 'rgba(55,150,95,.25)' : 'rgba(255,255,255,.12)';
+  const discoveryBadge = $('#discoveryBadge');
+  discoveryBadge.textContent = appConfig.discoveryEnabled ? 'Busca ativa' : 'Requer chave OpenAI';
+  discoveryBadge.className = `badge ${appConfig.discoveryEnabled ? 'approved' : 'medium'}`;
+  $('#discoverLeads').disabled = !appConfig.discoveryEnabled;
+  $('#discoverLeads').title = appConfig.discoveryEnabled ? '' : 'Preencha OPENAI_API_KEY no arquivo .env';
 }
 
 async function loadStats() {
@@ -67,6 +83,56 @@ async function loadStats() {
   const campaignBadge = $('#campaignBadge');
   campaignBadge.textContent = data.campaignActive ? 'Ativa' : 'Pausada';
   campaignBadge.className = `badge ${data.campaignActive ? 'approved' : 'neutral'}`;
+
+  const funnel = [
+    ['Taxa de resposta', `${data.responseRate}%`, `${data.replied} de ${data.sent} envios`, ''],
+    ['Interessados', data.interested, `${data.interestRate}% das respostas`, 'positive'],
+    ['Não interessados', data.notInterested, `${data.rejectionRate}% das respostas`, 'negative'],
+    ['Não quer receber', data.optedOut, `${data.optOutRate}% dos envios`, 'negative'],
+    ['A classificar', data.unclassified, 'Respostas que precisam de revisão', ''],
+    ['Entregabilidade', `${data.deliveryRate}%`, `${data.bounced} bounces`, 'positive'],
+  ];
+  $('#funnelStats').replaceChildren(...funnel.map(([label, value, caption, type]) => {
+    const card = document.createElement('div'); card.className = `funnel-card ${type}`;
+    const metric = document.createElement('div'); metric.className = 'metric'; metric.textContent = value;
+    const labelEl = document.createElement('strong'); labelEl.textContent = label;
+    const captionEl = document.createElement('div'); captionEl.className = 'caption'; captionEl.textContent = caption;
+    card.append(metric, labelEl, captionEl);
+    return card;
+  }));
+}
+
+function renderStateKpis() {
+  const selected = $('#stateKpiFilter').value;
+  const rows = selected ? stateKpiData.filter((row) => row.uf === selected) : stateKpiData;
+  const tbody = $('#stateKpiRows');
+  tbody.replaceChildren();
+  for (const row of rows) {
+    const tr = document.createElement('tr');
+    const values = [
+      row.uf, row.total, row.sent, row.replied, `${row.responseRate}%`,
+      row.interested, row.notInterested, row.optedOut, row.bounced,
+    ];
+    for (const [index, value] of values.entries()) {
+      const td = document.createElement('td');
+      td.textContent = value;
+      if (index === 4) td.className = 'rate';
+      tr.append(td);
+    }
+    tbody.append(tr);
+  }
+}
+
+async function loadStateKpis() {
+  stateKpiData = await api('/api/kpis/states');
+  const filter = $('#stateKpiFilter');
+  const current = filter.value;
+  filter.replaceChildren(new Option('Todos os estados', ''));
+  for (const row of [...stateKpiData].sort((a, b) => a.uf.localeCompare(b.uf))) {
+    filter.append(new Option(row.uf, row.uf));
+  }
+  filter.value = current;
+  renderStateKpis();
 }
 
 function queryString() {
@@ -123,7 +189,7 @@ async function loadEvents() {
 }
 
 async function refresh() {
-  await Promise.all([loadStats(), loadLeads(), loadEvents()]);
+  await Promise.all([loadStats(), loadStateKpis(), loadLeads(), loadEvents()]);
 }
 
 async function openLead(id) {
@@ -134,6 +200,8 @@ async function openLead(id) {
   $('#editInitial').value = currentLead.initialBody || '';
   $('#editFollow1').value = currentLead.followup1Body || '';
   $('#editFollow2').value = currentLead.followup2Body || '';
+  $('#editResponseClass').value = currentLead.responseClass || '';
+  $('#editResponse').value = currentLead.response || '';
   $('#editNotes').value = currentLead.notes || '';
   $('#dialogConfidence').replaceChildren(badge(currentLead.confidence, confidenceType(currentLead.confidence)));
   const source = currentLead.specificSource || currentLead.emailSource || '';
@@ -160,6 +228,7 @@ async function saveCurrentLead() {
       initialBody: $('#editInitial').value,
       followup1Body: $('#editFollow1').value,
       followup2Body: $('#editFollow2').value,
+      responseClass: $('#editResponseClass').value,
       notes: $('#editNotes').value,
     }),
   });
@@ -168,6 +237,7 @@ async function saveCurrentLead() {
 }
 
 $('#applyFilters').addEventListener('click', async () => { page = 1; await loadLeads(); });
+$('#stateKpiFilter').addEventListener('change', renderStateKpis);
 $('#search').addEventListener('keydown', async (event) => { if (event.key === 'Enter') { page = 1; await loadLeads(); } });
 $('#prevPage').addEventListener('click', async () => { page -= 1; await loadLeads(); });
 $('#nextPage').addEventListener('click', async () => { page += 1; await loadLeads(); });
@@ -274,6 +344,93 @@ $('#verifySmtp').addEventListener('click', async () => {
   try { await api('/api/smtp/verify', { method: 'POST', body: '{}' }); showMessage('Conexão SMTP validada.'); }
   catch (error) { showMessage(error.message, true); }
 });
+
+function discoveryMessage(text, error = false) {
+  const element = $('#discoveryStatus');
+  element.textContent = text;
+  element.classList.remove('hidden', 'error');
+  if (error) element.classList.add('error');
+}
+
+function sourceLink(label, url) {
+  const link = document.createElement('a');
+  link.textContent = label;
+  link.href = url;
+  link.target = '_blank';
+  link.rel = 'noreferrer';
+  return link;
+}
+
+function renderDiscoveryResults(result) {
+  const container = $('#discoveryResults');
+  container.replaceChildren();
+  if (!result.candidates.length) {
+    const empty = document.createElement('div');
+    empty.className = 'discovery-empty';
+    empty.textContent = 'Nenhum contato passou por todas as validações. Tente outro segmento ou uma busca mais ampla.';
+    container.append(empty);
+    return;
+  }
+
+  for (const candidate of result.candidates) {
+    const card = document.createElement('article');
+    card.className = 'discovery-card';
+    const title = document.createElement('h3'); title.textContent = candidate.company;
+    const meta = document.createElement('div'); meta.className = 'meta';
+    meta.textContent = `${candidate.city}/${candidate.uf} • ${candidate.segment}`;
+    const email = document.createElement('strong'); email.textContent = candidate.email;
+    const evidence = document.createElement('div'); evidence.textContent = candidate.evidence || 'Dados confirmados nas fontes públicas.';
+    const chips = document.createElement('div'); chips.className = 'validation-row';
+    for (const text of ['E-mail corporativo', 'MX válido', 'Fonte pública']) {
+      const chip = document.createElement('span'); chip.className = 'validation-chip'; chip.textContent = text; chips.append(chip);
+    }
+    const links = document.createElement('div'); links.className = 'source-links';
+    links.append(sourceLink('Fonte do e-mail ↗', candidate.emailSource), sourceLink('Fonte da empresa ↗', candidate.companySource));
+    if (candidate.website) links.append(sourceLink('Site ↗', candidate.website));
+    const importButton = document.createElement('button'); importButton.className = 'primary'; importButton.textContent = 'Adicionar à fila';
+    importButton.addEventListener('click', async () => {
+      try {
+        importButton.disabled = true;
+        await api('/api/discovery/import', { method: 'POST', body: JSON.stringify({ candidate }) });
+        importButton.textContent = 'Adicionado à fila';
+        showMessage(`${candidate.company} foi adicionada e aguarda revisão.`);
+        await refresh();
+      } catch (error) {
+        importButton.disabled = false;
+        showMessage(error.message, true);
+      }
+    });
+    card.append(title, meta, email, evidence, chips, links, importButton);
+    container.append(card);
+  }
+}
+
+$('#discoverLeads').addEventListener('click', async () => {
+  const button = $('#discoverLeads');
+  button.disabled = true;
+  discoveryMessage('Pesquisando fontes públicas e validando domínios. Isso pode levar alguns minutos...');
+  $('#discoveryResults').replaceChildren();
+  try {
+    const result = await api('/api/discovery/search', {
+      method: 'POST',
+      body: JSON.stringify({
+        uf: $('#discoveryUf').value,
+        segment: $('#discoverySegment').value,
+        limit: Number($('#discoveryLimit').value),
+      }),
+    });
+    discoveryMessage(`${result.found} novos contatos validados em ${result.uf}. Revise as fontes antes de importar.`);
+    renderDiscoveryResults(result);
+  } catch (error) {
+    discoveryMessage(error.message, true);
+  } finally {
+    button.disabled = !appConfig?.discoveryEnabled;
+  }
+});
+
+const ufSelect = $('#discoveryUf');
+for (const [uf, name] of UFS) ufSelect.append(new Option(`${uf} — ${name}`, uf));
+ufSelect.value = 'SP';
 
 await loadConfig();
 await refresh();
