@@ -37,11 +37,14 @@
           <h2>KPIs por estado</h2>
           <p>Compare resposta, interesse, rejeição e opt-out por UF.</p>
         </div>
-        <select id="stateKpiFilter" aria-label="Filtrar indicadores por estado">
-          <option value="">Todos os estados</option>
-        </select>
+        <div class="panel-actions">
+          <select id="stateKpiFilter" aria-label="Filtrar indicadores por estado">
+            <option value="">Todos os estados</option>
+          </select>
+          <button id="toggleStateKpis" type="button" aria-expanded="false" aria-controls="stateKpiContent">Expandir</button>
+        </div>
       </div>
-      <div class="table-wrap">
+      <div class="table-wrap" id="stateKpiContent" hidden>
         <table class="state-table">
           <thead><tr>
             <th>UF</th><th>Leads</th><th>Enviados</th><th>Respostas</th><th>Taxa resp.</th>

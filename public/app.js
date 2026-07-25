@@ -223,6 +223,15 @@ async function saveCurrentLead() {
 
 $('#applyFilters').addEventListener('click', async () => { page = 1; await loadLeads(); });
 $('#stateKpiFilter').addEventListener('change', renderStateKpis);
+$('#toggleStateKpis').addEventListener('click', () => {
+  const content = $('#stateKpiContent');
+  const button = $('#toggleStateKpis');
+  const expanded = content.hidden;
+  content.hidden = !expanded;
+  button.textContent = expanded ? 'Recolher' : 'Expandir';
+  button.setAttribute('aria-expanded', String(expanded));
+  localStorage.setItem('parts-seals-state-kpis-expanded', String(expanded));
+});
 $('#search').addEventListener('keydown', async (event) => { if (event.key === 'Enter') { page = 1; await loadLeads(); } });
 $('#prevPage').addEventListener('click', async () => { page -= 1; await loadLeads(); });
 $('#nextPage').addEventListener('click', async () => { page += 1; await loadLeads(); });
@@ -332,4 +341,7 @@ $('#verifySmtp').addEventListener('click', async () => {
 
 await loadConfig();
 await refresh();
+if (localStorage.getItem('parts-seals-state-kpis-expanded') === 'true') {
+  $('#toggleStateKpis').click();
+}
 setInterval(() => Promise.all([loadStats(), loadEvents()]).catch(console.error), 60_000);
