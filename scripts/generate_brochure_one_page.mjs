@@ -381,10 +381,10 @@ async function generate() {
     });
 
   const sealingMaterials = [
-    ["PU", 50, 36],
-    ["PTFE", 93, 40],
-    ["NBR", 140, 39],
-    ["FKM", 186, 39],
+    ["PU", 50, 63],
+    ["PTFE", 121, 63],
+    ["NBR", 192, 63],
+    ["FKM", 263, 63],
   ];
   sealingMaterials.forEach(([material, x, width]) => {
     roundRect(doc, x, 554, width, 20, 10, COLORS.red);
