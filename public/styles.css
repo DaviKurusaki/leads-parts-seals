@@ -4,7 +4,7 @@
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
   color:var(--ink); background:var(--bg);
 }
-*{box-sizing:border-box} body{margin:0} button,input,select,textarea{font:inherit}
+*{box-sizing:border-box} [hidden]{display:none!important} body{margin:0} button,input,select,textarea{font:inherit}
 .login-view{min-height:100vh;max-width:none;margin:0;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at 20% 10%,#a52c3c 0,#711824 34%,#241f23 100%)}
 .login-card{width:min(430px,100%);background:#fff;border-radius:20px;padding:34px;box-shadow:0 28px 80px rgba(0,0,0,.35)}
 .login-card h1{font-size:28px;margin:8px 0}.login-card>p{color:var(--muted);line-height:1.5;margin:0 0 24px}
