@@ -275,13 +275,19 @@ const isDirectExecution = process.argv[1]
   && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url;
 
 if (isDirectExecution) {
-  await initializeApp();
-  startScheduler();
-  app.listen(config.port, () => {
-    console.log(`Parts Seals Prospecção: http://localhost:${config.port}`);
-    console.log(`Modo de envio: ${config.sendMode}`);
-    if (config.sendMode !== 'live') console.log('Nenhum e-mail real será enviado; as prévias serão salvas em data/dry-run.');
-  });
+  initializeApp()
+    .then(() => {
+      startScheduler();
+      app.listen(config.port, () => {
+        console.log(`Parts Seals Prospecção: http://localhost:${config.port}`);
+        console.log(`Modo de envio: ${config.sendMode}`);
+        if (config.sendMode !== 'live') console.log('Nenhum e-mail real será enviado; as prévias serão salvas em data/dry-run.');
+      });
+    })
+    .catch((error) => {
+      console.error(error);
+      process.exitCode = 1;
+    });
 }
 
 export default app;

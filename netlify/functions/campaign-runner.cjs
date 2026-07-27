@@ -1,9 +1,14 @@
-import { processNext } from '../../src/scheduler.js';
-import { getState, loadState, refreshState } from '../../src/store.js';
-
 let initialization;
 
-export async function handler() {
+exports.handler = async function handler() {
+  const [
+    { processNext },
+    { getState, loadState, refreshState },
+  ] = await Promise.all([
+    import('../../src/scheduler.js'),
+    import('../../src/store.js'),
+  ]);
+
   initialization ||= loadState();
   await initialization;
   await refreshState({ force: true });
@@ -16,4 +21,4 @@ export async function handler() {
     statusCode: result.ok ? 200 : 202,
     body: JSON.stringify(result),
   };
-}
+};

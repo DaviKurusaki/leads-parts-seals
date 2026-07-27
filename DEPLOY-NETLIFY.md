@@ -3,8 +3,8 @@
 O projeto está preparado para usar:
 
 - `public/` como site estático;
-- `netlify/functions/api.mjs` como API Express serverless;
-- `netlify/functions/campaign-runner.mjs` como agendador da campanha;
+- `netlify/functions/api.cjs` como API Express serverless;
+- `netlify/functions/campaign-runner.cjs` como agendador da campanha;
 - Supabase como banco de dados e autenticação;
 - cookies seguros e `HttpOnly` para a sessão.
 
