@@ -1,15 +1,18 @@
 # Parts Seals — Automação de Prospecção B2B
 
-Pacote preparado para transformar a planilha comercial em uma fila segura de prospecção personalizada.
+Sistema preparado para manter uma fila online e segura de prospecção personalizada, com dados centralizados no Supabase.
 
 ## O que já está pronto
 
-- Planilha histórica `data/campanha.xlsx` com os 251 cadastros originais preservados.
-- Campanha ativa com 1.000 contatos aptos: 119 originais e 881 novos estabelecimentos ativos.
+- Banco Supabase com 986 prospects disponíveis para aprovação e acompanhamento.
+- Cadastro de 77 clientes ativos usado como bloqueio permanente de prospecção.
+- Planilha histórica `data/campanha.xlsx` preservada apenas como backup.
 - 251 conjuntos de assunto, e-mail inicial e dois follow-ups personalizados por empresa, segmento e contexto regional.
 - 119 empresas com e-mail na fila; 132 permanecem bloqueadas por ausência de e-mail público confiável.
 - Classificação de confiança: 82 altas, 37 moderadas e 132 baixas/sem e-mail.
 - Dashboard de aprovação, edição e acompanhamento.
+- Publicação serverless no Netlify, sem computador local ligado.
+- Tela de login, sessão protegida e gestão de usuários administradores/comuns.
 - Envio por SMTP com limite diário, limite por hora, intervalo mínimo e horário comercial.
 - Modo seguro `dry-run`, que cria prévias em HTML sem enviar mensagens reais.
 - Follow-ups automáticos somente quando não houver resposta, opt-out ou bounce.
@@ -21,13 +24,11 @@ Pacote preparado para transformar a planilha comercial em uma fila segura de pro
 - KPIs por estado para comparar resultados de cada UF.
 - Verificador básico de MX, SPF, DKIM e DMARC.
 
-## Base validada de 1.000 contatos
+## Base validada no Supabase
 
-Os 881 novos contatos estão no arquivo versionado
-`data/leads-rfb-2026-07-12.json` e são combinados automaticamente aos 119
-contatos aptos da planilha histórica. Na primeira inicialização após uma nova
-versão da base, os cadastros antigos sem e-mail ficam fora da campanha ativa,
-mas continuam preservados em `data/campanha.xlsx`.
+O Supabase é a fonte principal dos leads, clientes ativos, eventos, campanha e
+mensagens IMAP processadas. Os arquivos em `data/` permanecem somente como
+backup e fonte de auditoria da migração inicial.
 
 Critérios aplicados aos novos registros:
 
@@ -47,9 +48,12 @@ continuam sendo tratados pelo sistema e removem o contato da sequência.
 
 ## Estrutura
 
-- `data/campanha.xlsx`: base enriquecida e textos prontos.
+- `supabase/migrations/`: estrutura SQL do banco online.
+- `data/campanha.xlsx`: backup histórico da base enriquecida.
 - `public/`: painel visual.
-- `src/`: importação da planilha, servidor, agendador, SMTP, IMAP e pesquisa.
+- `netlify/`: API serverless e agendador para o Netlify.
+- `netlify.toml`: configuração de build, rotas, cabeçalhos e agenda.
+- `src/`: servidor, acesso ao Supabase, agendador, SMTP, IMAP e pesquisa.
 - `config/`: regras comerciais por segmento e contexto regional.
 - `prompts/`: prompts de pesquisa e revisão para novos cadastros.
 - `CHECKLIST-ANTES-DO-DISPARO.md`: aprovação operacional.
@@ -57,10 +61,17 @@ continuam sendo tratados pelo sistema e removem o contato da sequência.
 
 ## Instalação no Windows
 
-1. Instale o Node.js 20 ou superior.
-2. Execute `instalar.bat`.
-3. Abra o arquivo `.env` criado na pasta principal.
-4. Preencha remetente, SMTP, assinatura e, se desejar, IMAP/OpenAI.
+1. Execute `iniciar.bat`; na primeira vez ele instala o Node.js e as dependências.
+2. Abra o arquivo `.env` criado na pasta principal.
+3. Preencha `SUPABASE_SECRET_KEY`, remetente, SMTP e IMAP.
+4. Confirme que a configuração contém:
+
+```env
+DATA_BACKEND=supabase
+SUPABASE_URL=https://SEU-PROJETO.supabase.co
+SUPABASE_SECRET_KEY=
+```
+
 5. Mantenha inicialmente:
 
 ```env
@@ -68,12 +79,27 @@ SEND_MODE=dry-run
 DOMAIN_AUTH_CONFIRMED=false
 ```
 
-6. Execute `iniciar.bat`.
-7. Abra `http://localhost:3210`.
+6. Execute `iniciar.bat` novamente e abra `http://localhost:3210`.
 
 O `iniciar.bat` verifica as dependências, inicia o servidor em segundo plano e
 abre o painel automaticamente no navegador. Se o servidor já estiver ativo, ele
 apenas abre o painel novamente.
+
+## Publicação no Netlify
+
+O site não precisa de servidor local depois de publicado. O Netlify serve o
+painel, executa a API Express como Function e chama o processador da campanha a
+cada minuto. O horário comercial e os limites de envio continuam sendo
+aplicados antes de qualquer mensagem.
+
+Siga o guia [DEPLOY-NETLIFY.md](DEPLOY-NETLIFY.md). As chaves do Supabase,
+SMTP e IMAP devem ser cadastradas nas variáveis do projeto no Netlify, nunca no
+GitHub.
+
+O usuário `Admin` deste projeto já está cadastrado no Supabase Auth. Depois de
+entrar, troque a senha em **Minha senha**. As variáveis
+`INITIAL_ADMIN_USERNAME` e `INITIAL_ADMIN_PASSWORD` ficam disponíveis apenas
+para inicializar um Supabase novo.
 
 ## Fluxo recomendado
 
@@ -172,15 +198,18 @@ Para pesquisar todos gradualmente, execute novos lotes. O sistema ignora por pad
 6. Não há pixel de rastreamento ou coleta oculta de abertura.
 7. O rodapé informa a origem corporativa do contato e oferece remoção simples.
 
-## Atualização da planilha
+## Atualização da base
 
-A aba usada pelo sistema é `Campanha`. Para reimportar uma nova versão:
+Os registros são editados na tabela `leads` do Supabase ou pelo painel web.
+A tabela `active_clients` é a lista permanente de supressão. A reimportação por
+planilha local fica desativada quando `DATA_BACKEND=supabase`.
 
-1. Feche a campanha.
-2. Substitua `data/campanha.xlsx`.
-3. No painel ou API, execute a reimportação com a confirmação `REIMPORTAR PLANILHA`.
+Para verificar ou repetir a migração inicial:
 
-A reimportação recria o estado. Exporte o CSV antes caso já existam envios ou respostas.
+```bash
+npm run supabase:check
+npm run supabase:migrate
+```
 
 ## Testes técnicos
 

@@ -7,13 +7,39 @@
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
+  <main class="login-view" id="loginView">
+    <section class="login-card">
+      <div class="login-brand">PS</div>
+      <div class="eyebrow red">ACESSO RESTRITO</div>
+      <h1>Central de Prospecção</h1>
+      <p>Entre com seu usuário para acessar os dados comerciais da Parts Seals.</p>
+      <form id="loginForm" class="login-form">
+        <label>Usuário
+          <input id="loginUsername" name="username" autocomplete="username" required autofocus>
+        </label>
+        <label>Senha
+          <input id="loginPassword" name="password" type="password" autocomplete="current-password" required>
+        </label>
+        <button class="primary" type="submit" id="loginButton">Entrar</button>
+      </form>
+      <div id="loginMessage" class="message error hidden" role="alert"></div>
+    </section>
+  </main>
+
+  <div id="appView" hidden>
   <header class="topbar">
     <div>
       <div class="eyebrow">PARTS SEALS</div>
       <h1>Central de Prospecção</h1>
       <p>Pesquisa, aprovação, envio controlado e acompanhamento em uma única fila.</p>
     </div>
-    <div class="mode" id="modeBadge">Carregando...</div>
+    <div class="topbar-actions">
+      <div class="session-user"><span id="sessionUsername"></span><small id="sessionRole"></small></div>
+      <button id="manageUsers" class="topbar-button" type="button">Usuários</button>
+      <button id="changePassword" class="topbar-button" type="button">Minha senha</button>
+      <button id="logoutButton" class="topbar-button" type="button">Sair</button>
+      <div class="mode" id="modeBadge">Carregando...</div>
+    </div>
   </header>
 
   <main>
@@ -168,6 +194,51 @@
       </div>
     </form>
   </dialog>
+
+  <dialog id="usersDialog" class="settings-dialog">
+    <div class="dialog-shell">
+      <div class="dialog-header">
+        <div><div class="eyebrow red">SEGURANÇA</div><h2>Configurar usuários</h2><p>Crie acessos e remova contas que não devem mais entrar.</p></div>
+        <button type="button" id="closeUsersDialog" class="icon-button" aria-label="Fechar">×</button>
+      </div>
+      <div class="settings-content">
+        <form id="createUserForm" class="user-create-form">
+          <label>Novo usuário<input id="newUsername" autocomplete="off" minlength="3" maxlength="32" required></label>
+          <label>Senha inicial<input id="newUserPassword" type="password" autocomplete="new-password" minlength="8" required></label>
+          <label>Permissão
+            <select id="newUserRole">
+              <option value="user">Usuário</option>
+              <option value="admin">Administrador</option>
+            </select>
+          </label>
+          <button class="primary" type="submit">Criar usuário</button>
+        </form>
+        <div id="usersMessage" class="message hidden" role="status"></div>
+        <div class="table-wrap users-table-wrap">
+          <table class="users-table">
+            <thead><tr><th>Usuário</th><th>Permissão</th><th>Criado em</th><th>Último acesso</th><th></th></tr></thead>
+            <tbody id="userRows"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="passwordDialog" class="settings-dialog small-dialog">
+    <form id="passwordForm" class="dialog-shell">
+      <div class="dialog-header">
+        <div><div class="eyebrow red">SEGURANÇA</div><h2>Trocar minha senha</h2><p>Após a troca, entre novamente com a nova senha.</p></div>
+        <button type="button" class="icon-button" id="closePasswordDialog" aria-label="Fechar">×</button>
+      </div>
+      <div class="settings-content password-content">
+        <label>Nova senha<input id="newPassword" type="password" autocomplete="new-password" minlength="8" required></label>
+        <label>Confirmar nova senha<input id="confirmPassword" type="password" autocomplete="new-password" minlength="8" required></label>
+        <div id="passwordMessage" class="message hidden" role="alert"></div>
+        <button class="primary" type="submit">Salvar nova senha</button>
+      </div>
+    </form>
+  </dialog>
+  </div>
 
   <script type="module" src="/app.js"></script>
 </body>

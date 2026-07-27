@@ -15,6 +15,7 @@ function boolEnv(name, fallback = false) {
 export const config = Object.freeze({
   port: intEnv('PORT', 3210),
   timezone: process.env.TIMEZONE || 'America/Sao_Paulo',
+  dataBackend: (process.env.DATA_BACKEND || 'local').toLowerCase(),
   workbookPath: path.resolve(process.env.DATA_WORKBOOK || './data/campanha.xlsx'),
   activeClientsFile: path.resolve(process.env.ACTIVE_CLIENTS_FILE || './data/clientes-ativos.json'),
   stateFile: path.resolve(process.env.STATE_FILE || './data/state.json'),
@@ -63,6 +64,13 @@ export const config = Object.freeze({
   dkimSelector: process.env.DKIM_SELECTOR || '',
   openaiApiKey: process.env.OPENAI_API_KEY || '',
   openaiModel: process.env.OPENAI_MODEL || 'gpt-5.4',
+
+  supabase: {
+    url: process.env.SUPABASE_URL || '',
+    publishableKey: process.env.SUPABASE_PUBLISHABLE_KEY || '',
+    secretKey: process.env.SUPABASE_SECRET_KEY || '',
+    schema: process.env.SUPABASE_SCHEMA || 'public',
+  },
 });
 
 export function publicConfig() {
@@ -77,6 +85,7 @@ export function publicConfig() {
     senderSite: config.senderSite,
     imapEnabled: config.imap.enabled,
     researchEnabled: Boolean(config.openaiApiKey),
+    dataBackend: config.dataBackend,
     limits: config.limits,
   };
 }

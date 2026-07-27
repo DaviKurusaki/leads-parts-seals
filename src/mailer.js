@@ -34,6 +34,14 @@ export async function verifySmtp() {
 }
 
 async function saveDryRun({ lead, stage, target, message }) {
+  if (process.env.NETLIFY === 'true') {
+    return {
+      messageId: `dry-run:netlify:${lead.id}:${stage + 1}:${Date.now()}`,
+      previewFile: 'prévia temporária do Netlify',
+      attachment: stage === 0 ? path.basename(config.brochureFile) : null,
+      dryRun: true,
+    };
+  }
   const folder = path.resolve('./data/dry-run');
   await fs.mkdir(folder, { recursive: true });
   const safeCompany = lead.company.replace(/[^a-z0-9_-]+/gi, '-').replace(/-+/g, '-').slice(0, 60);

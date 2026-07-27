@@ -9,11 +9,14 @@
     "dev": "node --watch src/server.js",
     "dns": "node src/dnsCheck.js",
     "test": "node --test tests/*.test.js",
-    "check": "node --check src/server.js && node --check src/activeClients.js && node --check src/scheduler.js && node --check src/inbox.js && node --check src/mailer.js && node --check src/workbook.js && node --check src/reporting.js && node --check scripts/collect_rfb_candidates.mjs && node --check scripts/validate_select_candidates.mjs && node --check scripts/build_rfb_lead_seed.mjs && node --check public/app.js",
-    "research": "node src/researchBatch.js"
+    "check": "node --check src/server.js && node --check src/auth.js && node --check src/activeClients.js && node --check src/supabase.js && node --check src/supabaseStore.js && node --check src/scheduler.js && node --check src/inbox.js && node --check src/mailer.js && node --check src/workbook.js && node --check src/reporting.js && node --check netlify/functions/api.mjs && node --check netlify/functions/campaign-runner.mjs && node --check scripts/check_netlify_build.mjs && node --check scripts/collect_rfb_candidates.mjs && node --check scripts/validate_select_candidates.mjs && node --check scripts/build_rfb_lead_seed.mjs && node --check scripts/migrate_to_supabase.mjs && node --check public/app.js",
+    "research": "node src/researchBatch.js",
+    "netlify:check": "node scripts/check_netlify_build.mjs",
+    "supabase:check": "node scripts/migrate_to_supabase.mjs",
+    "supabase:migrate": "node scripts/migrate_to_supabase.mjs --apply"
   },
   "dependencies": {
-    "exceljs": "^4.4.0",
+    "@supabase/supabase-js": "^2.110.8",
     "express": "^5.1.0",
     "imapflow": "^1.0.181",
     "mailparser": "^3.7.4",
@@ -21,10 +24,14 @@
     "openai": "^5.12.2",
     "pdfkit": "^0.17.2",
     "qrcode": "^1.5.4",
+    "serverless-http": "^4.0.0",
     "svg-to-pdfkit": "^0.1.8",
-    "unzipper": "^0.10.14"
+    "unzipper": "^0.12.5"
   },
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.12"
   }
 }

@@ -5,16 +5,57 @@ let pageSize = 25;
 let currentLead = null;
 let appConfig = null;
 let stateKpiData = [];
+let currentUser = null;
+let dashboardStarted = false;
+let refreshTimer = null;
 
 async function api(url, options = {}) {
   const response = await fetch(url, {
+    credentials: 'same-origin',
     headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
     ...options,
   });
   const contentType = response.headers.get('content-type') || '';
   const payload = contentType.includes('json') ? await response.json() : await response.text();
+  if (response.status === 401 && url !== '/api/auth/login') showLogin();
   if (!response.ok) throw new Error(payload.error || payload.reason || JSON.stringify(payload));
   return payload;
+}
+
+function showLogin(message = '') {
+  if (refreshTimer) window.clearInterval(refreshTimer);
+  refreshTimer = null;
+  dashboardStarted = false;
+  currentUser = null;
+  $('#appView').hidden = true;
+  $('#loginView').hidden = false;
+  $('#loginPassword').value = '';
+  const messageEl = $('#loginMessage');
+  messageEl.textContent = message;
+  messageEl.classList.toggle('hidden', !message);
+}
+
+async function showDashboard(user) {
+  currentUser = user;
+  $('#loginView').hidden = true;
+  $('#appView').hidden = false;
+  $('#sessionUsername').textContent = user.username;
+  $('#sessionRole').textContent = user.role === 'admin' ? 'Administrador' : 'Usuário';
+  $('#manageUsers').hidden = user.role !== 'admin';
+  if (!dashboardStarted) {
+    dashboardStarted = true;
+    await loadConfig();
+    await refresh();
+    if (localStorage.getItem('parts-seals-state-kpis-expanded') === 'true') {
+      $('#toggleStateKpis').click();
+    }
+    refreshTimer = window.setInterval(
+      () => Promise.all([loadStats(), loadEvents()]).catch(console.error),
+      60_000,
+    );
+  } else {
+    await refresh();
+  }
 }
 
 function showMessage(text, error = false) {
@@ -339,9 +380,130 @@ $('#verifySmtp').addEventListener('click', async () => {
   catch (error) { showMessage(error.message, true); }
 });
 
-await loadConfig();
-await refresh();
-if (localStorage.getItem('parts-seals-state-kpis-expanded') === 'true') {
-  $('#toggleStateKpis').click();
+function formatUserDate(value) {
+  return value ? new Date(value).toLocaleString('pt-BR') : 'Nunca';
 }
-setInterval(() => Promise.all([loadStats(), loadEvents()]).catch(console.error), 60_000);
+
+function usersMessage(text, error = false) {
+  const el = $('#usersMessage');
+  el.textContent = text;
+  el.classList.remove('hidden', 'error');
+  if (error) el.classList.add('error');
+}
+
+async function loadUsers() {
+  const { users } = await api('/api/auth/users');
+  const tbody = $('#userRows');
+  tbody.replaceChildren();
+  for (const user of users) {
+    const tr = document.createElement('tr');
+    const username = document.createElement('td'); username.textContent = user.username;
+    const role = document.createElement('td'); role.append(badge(user.role === 'admin' ? 'Administrador' : 'Usuário', user.role === 'admin' ? 'approved' : 'neutral'));
+    const created = document.createElement('td'); created.textContent = formatUserDate(user.createdAt);
+    const lastLogin = document.createElement('td'); lastLogin.textContent = formatUserDate(user.lastSignInAt);
+    const actions = document.createElement('td');
+    const remove = document.createElement('button');
+    remove.type = 'button';
+    remove.className = 'danger';
+    remove.textContent = user.id === currentUser.id ? 'Sessão atual' : 'Apagar';
+    remove.disabled = user.id === currentUser.id;
+    remove.addEventListener('click', async () => {
+      if (!confirm(`Apagar definitivamente o usuário ${user.username}?`)) return;
+      try {
+        await api(`/api/auth/users/${user.id}`, { method: 'DELETE' });
+        usersMessage(`Usuário ${user.username} apagado.`);
+        await loadUsers();
+      } catch (error) { usersMessage(error.message, true); }
+    });
+    actions.append(remove);
+    tr.append(username, role, created, lastLogin, actions);
+    tbody.append(tr);
+  }
+}
+
+$('#loginForm').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const button = $('#loginButton');
+  button.disabled = true;
+  $('#loginMessage').classList.add('hidden');
+  try {
+    const result = await api('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({
+        username: $('#loginUsername').value,
+        password: $('#loginPassword').value,
+      }),
+    });
+    await showDashboard(result.user);
+  } catch (error) {
+    showLogin(error.message);
+  } finally {
+    button.disabled = false;
+  }
+});
+
+$('#logoutButton').addEventListener('click', async () => {
+  try { await api('/api/auth/logout', { method: 'POST', body: '{}' }); } catch {}
+  showLogin();
+});
+
+$('#manageUsers').addEventListener('click', async () => {
+  $('#usersMessage').classList.add('hidden');
+  $('#usersDialog').showModal();
+  try { await loadUsers(); } catch (error) { usersMessage(error.message, true); }
+});
+
+$('#closeUsersDialog').addEventListener('click', () => $('#usersDialog').close());
+
+$('#createUserForm').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  try {
+    const result = await api('/api/auth/users', {
+      method: 'POST',
+      body: JSON.stringify({
+        username: $('#newUsername').value,
+        password: $('#newUserPassword').value,
+        role: $('#newUserRole').value,
+      }),
+    });
+    event.currentTarget.reset();
+    usersMessage(`Usuário ${result.user.username} criado.`);
+    await loadUsers();
+  } catch (error) { usersMessage(error.message, true); }
+});
+
+$('#changePassword').addEventListener('click', () => {
+  $('#passwordForm').reset();
+  $('#passwordMessage').classList.add('hidden');
+  $('#passwordDialog').showModal();
+});
+
+$('#closePasswordDialog').addEventListener('click', () => $('#passwordDialog').close());
+
+$('#passwordForm').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const password = $('#newPassword').value;
+  const confirmation = $('#confirmPassword').value;
+  const message = $('#passwordMessage');
+  if (password !== confirmation) {
+    message.textContent = 'As senhas não coincidem.';
+    message.className = 'message error';
+    return;
+  }
+  try {
+    await api('/api/auth/password', { method: 'POST', body: JSON.stringify({ password }) });
+    $('#passwordDialog').close();
+    dashboardStarted = false;
+    showLogin('Senha alterada. Entre novamente.');
+  } catch (error) {
+    message.textContent = error.message;
+    message.className = 'message error';
+  }
+});
+
+try {
+  const { user } = await api('/api/auth/me');
+  await showDashboard(user);
+} catch {
+  showLogin();
+}

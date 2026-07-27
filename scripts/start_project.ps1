@@ -3,7 +3,7 @@ $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $logsDirectory = Join-Path $projectRoot 'data\logs'
 $appUrl = 'http://localhost:3210'
-$healthUrl = 'http://127.0.0.1:3210/api/config'
+$healthUrl = 'http://127.0.0.1:3210/api/health'
 
 Set-Location -LiteralPath $projectRoot
 

@@ -1,5 +1,4 @@
 import path from 'node:path';
-import ExcelJS from 'exceljs';
 import unzipper from 'unzipper';
 import { config } from './config.js';
 
@@ -106,37 +105,13 @@ async function readCampaignRowsFromXml(filePath) {
 }
 
 async function readRecords(filePath) {
-  try {
-    const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.readFile(filePath);
-    const sheet = workbook.getWorksheet('Campanha');
-    if (!sheet) throw new Error('A aba "Campanha" não foi encontrada na planilha.');
-
-    const headers = {};
-    sheet.getRow(1).eachCell((cell, colNumber) => {
-      headers[normalize(cell.value)] = colNumber;
-    });
-    const records = [];
-    sheet.eachRow((row, rowNumber) => {
-      if (rowNumber === 1) return;
-      records.push(Object.fromEntries(
-        Object.entries(headers).map(([name, colNumber]) => [
-          name,
-          normalize(row.getCell(colNumber).value),
-        ]),
-      ));
-    });
-    return records;
-  } catch (error) {
-    console.warn(`Leitura padrão do XLSX indisponível; usando modo compatível: ${error.message}`);
-    const rows = await readCampaignRowsFromXml(filePath);
-    const headers = Object.fromEntries(
-      Object.entries(rows[0]).map(([column, name]) => [normalize(name), column]),
-    );
-    return rows.slice(1).map((row) => Object.fromEntries(
-      Object.entries(headers).map(([name, column]) => [name, normalize(row[column])]),
-    ));
-  }
+  const rows = await readCampaignRowsFromXml(filePath);
+  const headers = Object.fromEntries(
+    Object.entries(rows[0]).map(([column, name]) => [normalize(name), column]),
+  );
+  return rows.slice(1).map((row) => Object.fromEntries(
+    Object.entries(headers).map(([name, column]) => [name, normalize(row[column])]),
+  ));
 }
 
 export async function readCampaignWorkbook(filePath = config.workbookPath) {

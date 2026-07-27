@@ -1,10 +1,18 @@
 import { config } from './config.js';
-import { addEvent, getState, saveState, updateLead } from './store.js';
+import { addEvent, getLead, getState, refreshState, saveState, updateLead } from './store.js';
 import { dateKey, isBusinessWindow, nextStageDueAt } from './businessTime.js';
 import { sendLeadEmail } from './mailer.js';
+import { activeClientMatch } from './activeClients.js';
+import {
+  cancelEmailJob,
+  completeEmailJob,
+  enqueueAndClaimEmailJob,
+  failEmailJob,
+} from './supabaseStore.js';
 
 let timer = null;
 let running = false;
+const workerId = `${process.env.COMPUTERNAME || 'parts-seals'}-${process.pid}`;
 
 function sentEvents() {
   return getState().events.filter((event) => event.type === 'email.sent' && !event.dryRun);
@@ -43,6 +51,7 @@ export function determineNextStage(lead, now = new Date()) {
 export function isEligible(lead, now = new Date()) {
   if (!lead.canSend || !lead.email || !lead.approved) return false;
   if (lead.optedOut || lead.bounce || lead.replied || lead.paused) return false;
+  if (activeClientMatch(lead, getState().activeClients || [])) return false;
   if (config.sendMode !== 'live' && lead.dryRunGenerated) return false;
   return determineNextStage(lead, now) !== null;
 }
@@ -66,7 +75,9 @@ export function nextCandidate(now = new Date()) {
 export async function processNext({ ignoreBusinessWindow = false } = {}) {
   if (running) return { ok: false, reason: 'Já existe um envio em processamento.' };
   running = true;
+  let claimedJob = null;
   try {
+    if (config.dataBackend === 'supabase') await refreshState({ force: true });
     const now = new Date();
     if (!ignoreBusinessWindow && !isBusinessWindow(now)) {
       return { ok: false, reason: 'Fora do horário comercial configurado.' };
@@ -76,9 +87,29 @@ export async function processNext({ ignoreBusinessWindow = false } = {}) {
     if (!limits.hourReady) return { ok: false, reason: 'Limite por hora atingido.', limits };
     if (!limits.intervalReady) return { ok: false, reason: 'Intervalo mínimo ainda não concluído.', limits };
 
-    const lead = nextCandidate(now);
+    let lead;
+    let stage;
+    if (config.dataBackend === 'supabase') {
+      const eligible = getState().leads
+        .filter((candidate) => isEligible(candidate, now))
+        .map((candidate) => ({ lead: candidate, stage: determineNextStage(candidate, now) }));
+
+      for (let attempt = 0; attempt < 20; attempt += 1) {
+        claimedJob = await enqueueAndClaimEmailJob(eligible, workerId);
+        if (!claimedJob) break;
+        lead = getLead(claimedJob.lead_id);
+        stage = lead ? determineNextStage(lead, now) : null;
+        if (lead && isEligible(lead, now) && stage === claimedJob.stage) break;
+        await cancelEmailJob(claimedJob.id, 'Lead não está mais elegível.');
+        claimedJob = null;
+        lead = null;
+      }
+    } else {
+      lead = nextCandidate(now);
+      stage = lead ? determineNextStage(lead, now) : null;
+    }
+
     if (!lead) return { ok: false, reason: 'Nenhum lead elegível no momento.' };
-    const stage = determineNextStage(lead, now);
     const result = await sendLeadEmail(lead, stage);
     const at = new Date().toISOString();
 
@@ -100,8 +131,10 @@ export async function processNext({ ignoreBusinessWindow = false } = {}) {
     getState().campaign.lastSendAt = at;
     addEvent('email.sent', { leadId: lead.id, company: lead.company, email: lead.email, stage, dryRun: result.dryRun, messageId: result.messageId });
     await saveState();
+    if (claimedJob) await completeEmailJob(claimedJob.id, result.messageId);
     return { ok: true, leadId: lead.id, company: lead.company, stage, ...result };
   } catch (error) {
+    if (claimedJob) await failEmailJob(claimedJob.id, error.message).catch(console.error);
     addEvent('email.error', { message: error.message });
     await saveState();
     return { ok: false, reason: error.message };
@@ -111,6 +144,7 @@ export async function processNext({ ignoreBusinessWindow = false } = {}) {
 }
 
 async function tick() {
+  if (config.dataBackend === 'supabase') await refreshState({ force: true });
   const state = getState();
   if (!state.campaign.active) return;
   await processNext();

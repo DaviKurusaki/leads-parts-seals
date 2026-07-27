@@ -3,9 +3,15 @@ import path from 'node:path';
 import { config } from './config.js';
 import { readCampaignWorkbook } from './workbook.js';
 import { filterActiveClients } from './activeClients.js';
+import { getSupabaseSignature, loadSupabaseState, saveSupabaseState } from './supabaseStore.js';
 
 let state = null;
 let writeChain = Promise.resolve();
+let lastSupabaseRefreshAt = 0;
+let lastSupabaseSignature = '';
+let refreshPromise = null;
+const dirtyLeadIds = new Set();
+const dirtyEventIds = new Set();
 
 async function readLeadSeed() {
   try {
@@ -59,6 +65,18 @@ function initialState(leads) {
 export async function saveState() {
   if (!state) throw new Error('Estado ainda não carregado.');
   state.updatedAt = new Date().toISOString();
+  if (config.dataBackend === 'supabase') {
+    const leadsToSave = [...dirtyLeadIds];
+    const eventsToSave = [...dirtyEventIds];
+    await saveSupabaseState(state, {
+      dirtyLeadIds: leadsToSave,
+      dirtyEventIds: eventsToSave,
+    });
+    for (const id of leadsToSave) dirtyLeadIds.delete(id);
+    for (const id of eventsToSave) dirtyEventIds.delete(id);
+    lastSupabaseRefreshAt = Date.now();
+    return state;
+  }
   await fs.mkdir(path.dirname(config.stateFile), { recursive: true });
   const temp = `${config.stateFile}.tmp`;
   writeChain = writeChain.then(async () => {
@@ -70,6 +88,12 @@ export async function saveState() {
 
 export async function loadState() {
   if (state) return state;
+  if (config.dataBackend === 'supabase') {
+    state = await loadSupabaseState();
+    lastSupabaseSignature = state._supabaseSignature;
+    lastSupabaseRefreshAt = Date.now();
+    return state;
+  }
   let changed = false;
   try {
     state = JSON.parse(await fs.readFile(config.stateFile, 'utf8'));
@@ -100,6 +124,30 @@ export async function loadState() {
   return state;
 }
 
+export async function refreshState({ force = false } = {}) {
+  if (config.dataBackend !== 'supabase') return loadState();
+  if (!force && state && Date.now() - lastSupabaseRefreshAt < 10_000) return state;
+  if (dirtyLeadIds.size || dirtyEventIds.size) await saveState();
+  if (!refreshPromise) {
+    refreshPromise = getSupabaseSignature()
+      .then(async (signature) => {
+        if (state && signature === lastSupabaseSignature) {
+          lastSupabaseRefreshAt = Date.now();
+          return state;
+        }
+        const loaded = await loadSupabaseState();
+        state = loaded;
+        lastSupabaseSignature = loaded._supabaseSignature;
+        lastSupabaseRefreshAt = Date.now();
+        return state;
+      })
+      .finally(() => {
+        refreshPromise = null;
+      });
+  }
+  return refreshPromise;
+}
+
 export function getState() {
   if (!state) throw new Error('Estado ainda não carregado.');
   return state;
@@ -113,6 +161,7 @@ export function updateLead(id, patch) {
   const lead = getLead(id);
   if (!lead) throw new Error('Lead não encontrado.');
   Object.assign(lead, patch, { updatedAt: new Date().toISOString() });
+  dirtyLeadIds.add(Number(lead.id));
   return lead;
 }
 
@@ -120,10 +169,14 @@ export function addEvent(type, details = {}) {
   const event = { id: crypto.randomUUID(), type, at: new Date().toISOString(), ...details };
   getState().events.unshift(event);
   getState().events = getState().events.slice(0, 2000);
+  dirtyEventIds.add(event.id);
   return event;
 }
 
 export async function resetFromWorkbook() {
+  if (config.dataBackend === 'supabase') {
+    throw new Error('A reimportação por planilha local está desativada no modo Supabase.');
+  }
   const leads = await readCampaignWorkbook();
   const { kept, suppressed } = await filterActiveClients(leads);
   state = initialState(kept);

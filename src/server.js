@@ -1,25 +1,66 @@
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import express from 'express';
 import { config, publicConfig, validateLiveSending } from './config.js';
-import { addEvent, getLead, getState, loadState, resetFromWorkbook, saveState, updateLead } from './store.js';
+import { addEvent, getLead, getState, loadState, refreshState, resetFromWorkbook, saveState, updateLead } from './store.js';
 import { activateCampaign, limitStatus, pauseCampaign, processNext, startScheduler } from './scheduler.js';
 import { sendLeadEmail, verifySmtp } from './mailer.js';
 import { syncInbox } from './inbox.js';
 import { researchLead } from './research.js';
 import { exportCsv, stateKpis, stats } from './reporting.js';
+import { resetEmailJobs } from './supabaseStore.js';
+import {
+  changePassword,
+  createUser,
+  deleteUser,
+  listUsers,
+  login,
+  logout,
+  me,
+  requireAdmin,
+  requireAuth,
+  validateSameOrigin,
+} from './auth.js';
 
-await loadState();
-startScheduler();
+let initialization;
 
-const app = express();
+export function initializeApp() {
+  initialization ||= loadState();
+  return initialization;
+}
+
+export const app = express();
 app.use(express.json({ limit: '2mb' }));
 app.use(express.static(path.resolve('./public')));
 
 function asyncRoute(handler) {
   return async (req, res, next) => {
-    try { await handler(req, res); } catch (error) { next(error); }
+    try { await handler(req, res, next); } catch (error) { next(error); }
   };
 }
+
+app.use('/api', (_req, res, next) => {
+  res.setHeader('Cache-Control', 'private, no-store');
+  res.setHeader('Pragma', 'no-cache');
+  next();
+});
+
+app.get('/api/health', (_req, res) => res.json({ ok: true }));
+app.post('/api/auth/login', asyncRoute(login));
+app.use('/api', asyncRoute(requireAuth));
+app.use('/api', validateSameOrigin);
+app.get('/api/auth/me', me);
+app.post('/api/auth/logout', asyncRoute(logout));
+app.post('/api/auth/password', asyncRoute(changePassword));
+app.get('/api/auth/users', requireAdmin, asyncRoute(listUsers));
+app.post('/api/auth/users', requireAdmin, asyncRoute(createUser));
+app.delete('/api/auth/users/:id', requireAdmin, asyncRoute(deleteUser));
+
+app.use('/api', asyncRoute(async (_req, _res, next) => {
+  await initializeApp();
+  await refreshState();
+  next();
+}));
 
 function leadOr404(req, res) {
   const lead = getLead(req.params.id);
@@ -118,6 +159,7 @@ app.post('/api/leads/:id/reset-preview', asyncRoute(async (req, res) => {
   const lead = leadOr404(req, res);
   if (!lead) return;
   updateLead(lead.id, { dryRunGenerated: false, campaignStatus: lead.approved ? 'Aprovado' : 'Aguardando aprovação' });
+  if (config.dataBackend === 'supabase') await resetEmailJobs(lead.id);
   await saveState();
   res.json(getLead(lead.id));
 }));
@@ -229,8 +271,17 @@ app.use((error, _req, res, _next) => {
   res.status(500).json({ error: error.message || 'Erro interno.' });
 });
 
-app.listen(config.port, () => {
-  console.log(`Parts Seals Prospecção: http://localhost:${config.port}`);
-  console.log(`Modo de envio: ${config.sendMode}`);
-  if (config.sendMode !== 'live') console.log('Nenhum e-mail real será enviado; as prévias serão salvas em data/dry-run.');
-});
+const isDirectExecution = process.argv[1]
+  && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url;
+
+if (isDirectExecution) {
+  await initializeApp();
+  startScheduler();
+  app.listen(config.port, () => {
+    console.log(`Parts Seals Prospecção: http://localhost:${config.port}`);
+    console.log(`Modo de envio: ${config.sendMode}`);
+    if (config.sendMode !== 'live') console.log('Nenhum e-mail real será enviado; as prévias serão salvas em data/dry-run.');
+  });
+}
+
+export default app;
