@@ -44,13 +44,12 @@ async function showDashboard(user) {
   $('#manageUsers').hidden = user.role !== 'admin';
   if (!dashboardStarted) {
     dashboardStarted = true;
-    await loadConfig();
     await refresh();
     if (localStorage.getItem('parts-seals-state-kpis-expanded') === 'true') {
       $('#toggleStateKpis').click();
     }
     refreshTimer = window.setInterval(
-      () => Promise.all([loadStats(), loadEvents()]).catch(console.error),
+      () => Promise.all([loadConfig(), loadStats(), loadEvents()]).catch(console.error),
       60_000,
     );
   } else {
@@ -220,7 +219,7 @@ async function loadEvents() {
 }
 
 async function refresh() {
-  await Promise.all([loadStats(), loadStateKpis(), loadLeads(), loadEvents()]);
+  await Promise.all([loadConfig(), loadStats(), loadStateKpis(), loadLeads(), loadEvents()]);
 }
 
 async function openLead(id) {
