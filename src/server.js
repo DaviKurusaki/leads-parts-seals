@@ -180,6 +180,34 @@ app.post('/api/approve-high-confidence', asyncRoute(async (req, res) => {
   res.json({ ok: true, count });
 }));
 
+app.post('/api/approve-moderate-confidence', asyncRoute(async (req, res) => {
+  if (req.body.confirm !== 'APROVAR CONFIANÇA MODERADA') {
+    return res.status(400).json({ error: 'Confirmação inválida.' });
+  }
+  let count = 0;
+  for (const lead of getState().leads) {
+    if (
+      lead.confidence === 'Moderada'
+      && lead.canSend
+      && lead.email
+      && !lead.optedOut
+      && !lead.bounce
+    ) {
+      updateLead(lead.id, {
+        approved: true,
+        approvedAt: new Date().toISOString(),
+        campaignStatus: 'Aprovado',
+        paused: false,
+        dryRunGenerated: false,
+      });
+      count += 1;
+    }
+  }
+  addEvent('leads.bulkApproved', { count, confidence: 'Moderada' });
+  await saveState();
+  res.json({ ok: true, count });
+}));
+
 app.post('/api/test-email', asyncRoute(async (req, res) => {
   const lead = getLead(req.body.leadId);
   if (!lead) return res.status(404).json({ error: 'Lead não encontrado.' });

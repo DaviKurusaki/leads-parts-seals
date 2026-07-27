@@ -354,6 +354,19 @@ $('#approveHigh').addEventListener('click', async () => {
   } catch (error) { showMessage(error.message, true); }
 });
 
+$('#approveModerate').addEventListener('click', async () => {
+  const text = prompt('Esta ação aprova todos os leads de confiança moderada. Digite: APROVAR CONFIANÇA MODERADA');
+  if (text !== 'APROVAR CONFIANÇA MODERADA') return;
+  try {
+    const result = await api('/api/approve-moderate-confidence', {
+      method: 'POST',
+      body: JSON.stringify({ confirm: text }),
+    });
+    showMessage(`${result.count} leads de confiança moderada foram aprovados.`);
+    await refresh();
+  } catch (error) { showMessage(error.message, true); }
+});
+
 $('#startCampaign').addEventListener('click', async () => {
   const text = prompt('Digite INICIAR CAMPANHA para confirmar. Em dry-run, somente prévias serão geradas.');
   if (text !== 'INICIAR CAMPANHA') return;
