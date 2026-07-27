@@ -38,6 +38,8 @@ export const config = Object.freeze({
     secure: boolEnv('SMTP_SECURE', false),
     user: process.env.SMTP_USER || '',
     pass: process.env.SMTP_PASS || '',
+    maxAttempts: Math.max(intEnv('SMTP_MAX_ATTEMPTS', 3), 1),
+    retryBaseDelayMs: Math.max(intEnv('SMTP_RETRY_BASE_DELAY_MS', 1_000), 0),
   },
 
   imap: {

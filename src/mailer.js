@@ -18,6 +18,37 @@ function getTransporter() {
   return transporter;
 }
 
+function resetTransporter() {
+  transporter?.close?.();
+  transporter = null;
+}
+
+export function isTransientSmtpError(error) {
+  const responseCode = Number(error?.responseCode);
+  if (responseCode >= 400 && responseCode < 500) return true;
+  return ['ETIMEDOUT', 'ECONNECTION', 'ECONNRESET', 'ESOCKET'].includes(error?.code);
+}
+
+async function sendMailWithRetry(mailOptions) {
+  let lastError;
+  for (let attempt = 1; attempt <= config.smtp.maxAttempts; attempt += 1) {
+    try {
+      return await getTransporter().sendMail(mailOptions);
+    } catch (error) {
+      lastError = error;
+      if (!isTransientSmtpError(error) || attempt === config.smtp.maxAttempts) throw error;
+      resetTransporter();
+      const delayMs = config.smtp.retryBaseDelayMs * attempt;
+      console.warn(
+        `Falha SMTP temporária (${error.responseCode || error.code || 'sem código'}). `
+        + `Nova tentativa ${attempt + 1}/${config.smtp.maxAttempts} em ${delayMs} ms.`,
+      );
+      if (delayMs > 0) await new Promise((resolve) => setTimeout(resolve, delayMs));
+    }
+  }
+  throw lastError;
+}
+
 export async function verifySmtp() {
   const issues = [];
   if (!config.senderEmail) issues.push('SENDER_EMAIL não foi preenchido.');
@@ -184,7 +215,7 @@ export async function sendLeadEmail(lead, stage = 0, targetOverride = '') {
   if (issues.length) throw new Error(`Envio ao vivo bloqueado: ${issues.join(' ')}`);
 
   const sentAt = new Date();
-  const info = await getTransporter().sendMail(leadMailOptions(lead, stage, target));
+  const info = await sendMailWithRetry(leadMailOptions(lead, stage, target));
   const sentCopy = await saveSentCopyWithRetry(lead, stage, target, {
     messageId: info.messageId,
     sentAt,
