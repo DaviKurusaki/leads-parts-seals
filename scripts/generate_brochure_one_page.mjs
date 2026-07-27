@@ -8,12 +8,14 @@ import SVGtoPDF from "svg-to-pdfkit";
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..");
 const ASSETS = path.join(ROOT, "assets");
-const OUTPUT = path.join(
-  ROOT,
-  "output",
-  "pdf",
-  "apresentacao-comercial-parts-seals.pdf",
-);
+const OUTPUT = process.env.BROCHURE_OUTPUT
+  ? path.resolve(process.env.BROCHURE_OUTPUT)
+  : path.join(
+    ROOT,
+    "output",
+    "pdf",
+    "apresentacao-comercial-parts-seals.pdf",
+  );
 
 const PAGE = { width: 595.28, height: 841.89 };
 const COLORS = {
@@ -36,6 +38,7 @@ const CONTACT = {
   phone: "tel:+551936263552",
   email: "mailto:vendas@parts-seals.com.br",
   site: "https://parts-seals.com.br",
+  profiles: "https://parts-seals.com.br/assets/folder-parts-seals.pdf",
 };
 
 const fonts = {
@@ -61,6 +64,7 @@ function drawIcon(doc, name, x, y, size, color) {
     mail: `<svg viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>`,
     whatsapp: `<svg viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l1.7-4A9 9 0 1 1 8 20.1L3 21"/><path d="M9 8.5c.2 2.3 2.2 4.3 4.5 4.6l1.3-1.3 2.2 1v2c0 .6-.4 1-1 1A8 8 0 0 1 8 8c0-.6.4-1 1-1h2l1 2.2-1.3 1.3"/></svg>`,
     globe: `<svg viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.4 2.5 3.7 5.5 3.7 9S14.4 18.5 12 21M12 3c-2.4 2.5-3.7 5.5-3.7 9s1.3 6.5 3.7 9"/></svg>`,
+    profiles: `<svg viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 6 7-3 7 3-7 3-7-3Z"/><path d="m5 12 7 3 7-3"/><path d="m5 17 7 3 7-3"/></svg>`,
   };
   SVGtoPDF(doc, icons[name], x, y, {
     width: size,
@@ -503,18 +507,31 @@ async function generate() {
       773,
       { width: 300, lineBreak: false },
     );
-  roundRect(doc, 43, 794, 225, 23, 11.5, COLORS.white);
-  drawIcon(doc, "whatsapp", 56, 800, 11, COLORS.redDark);
+  roundRect(doc, 43, 794, 104, 23, 11.5, COLORS.white);
+  drawIcon(doc, "whatsapp", 52, 800, 11, COLORS.redDark);
   doc
     .font("Bold")
-    .fontSize(7.1)
+    .fontSize(6.2)
     .fillColor(COLORS.redDark)
-    .text("ENVIAR APLICAÇÃO NO WHATSAPP  →", 72, 801.2, {
-      width: 184,
+    .text("WHATSAPP  →", 66, 801.6, {
+      width: 70,
       align: "center",
       lineBreak: false,
     });
-  doc.link(43, 794, 225, 23, CONTACT.whatsapp);
+  doc.link(43, 794, 104, 23, CONTACT.whatsapp);
+
+  roundRect(doc, 153, 794, 115, 23, 11.5, "#FFF4F5", "#FFFFFF");
+  drawIcon(doc, "profiles", 162, 800, 11, COLORS.redDark);
+  doc
+    .font("Bold")
+    .fontSize(5.8)
+    .fillColor(COLORS.redDark)
+    .text("PRINCIPAIS PERFIS  →", 175, 801.8, {
+      width: 83,
+      align: "center",
+      lineBreak: false,
+    });
+  doc.link(153, 794, 115, 23, CONTACT.profiles);
 
   contactRow(doc, {
     x: 284,
