@@ -50,6 +50,7 @@ export const config = Object.freeze({
     mailbox: process.env.IMAP_MAILBOX || 'INBOX',
     sentMailbox: process.env.IMAP_SENT_MAILBOX || '',
   },
+  requireSentCopy: boolEnv('REQUIRE_SENT_COPY', true),
 
   limits: {
     maxPerDay: intEnv('MAX_PER_DAY', 20),
@@ -59,6 +60,15 @@ export const config = Object.freeze({
     businessEnd: process.env.BUSINESS_END || '17:00',
     followup1BusinessDays: intEnv('FOLLOWUP1_BUSINESS_DAYS', 4),
     followup2BusinessDays: intEnv('FOLLOWUP2_BUSINESS_DAYS', 9),
+  },
+  autoBatch: {
+    size: intEnv('AUTO_BATCH_SIZE', 5),
+    intervalMinutes: intEnv('AUTO_BATCH_INTERVAL_MINUTES', 15),
+    start: process.env.AUTO_BATCH_START || '14:00',
+    end: process.env.AUTO_BATCH_END || '15:30',
+    everyDay: boolEnv('AUTO_BATCH_EVERY_DAY', true),
+    maxPerDay: intEnv('AUTO_BATCH_MAX_PER_DAY', 35),
+    maxPerHour: intEnv('AUTO_BATCH_MAX_PER_HOUR', 25),
   },
 
   dkimSelector: process.env.DKIM_SELECTOR || '',
@@ -84,9 +94,11 @@ export function publicConfig() {
     senderPhone: config.senderPhone,
     senderSite: config.senderSite,
     imapEnabled: config.imap.enabled,
+    requireSentCopy: config.requireSentCopy,
     researchEnabled: Boolean(config.openaiApiKey),
     dataBackend: config.dataBackend,
     limits: config.limits,
+    autoBatch: config.autoBatch,
   };
 }
 
@@ -97,6 +109,15 @@ export function validateLiveSending() {
   if (!config.senderEmail) issues.push('SENDER_EMAIL não foi preenchido.');
   if (!config.smtp.host || !config.smtp.user || !config.smtp.pass) {
     issues.push('SMTP_HOST, SMTP_USER e SMTP_PASS precisam ser preenchidos.');
+  }
+  if (config.requireSentCopy && !config.imap.enabled) {
+    issues.push('IMAP_ENABLED precisa estar como true para salvar as cópias em Enviados.');
+  }
+  if (
+    config.requireSentCopy
+    && (!config.imap.host || !config.imap.user || !config.imap.pass)
+  ) {
+    issues.push('IMAP_HOST, IMAP_USER e IMAP_PASS precisam estar preenchidos para salvar as cópias.');
   }
   return issues;
 }

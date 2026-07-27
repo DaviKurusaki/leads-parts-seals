@@ -4,7 +4,7 @@ import express from 'express';
 import { config, publicConfig, validateLiveSending } from './config.js';
 import { addEvent, getLead, getState, loadState, refreshState, resetFromWorkbook, saveState, updateLead } from './store.js';
 import { activateCampaign, limitStatus, pauseCampaign, processNext, startScheduler } from './scheduler.js';
-import { sendLeadEmail, verifySmtp } from './mailer.js';
+import { sendLeadEmail, verifySentMailbox, verifySmtp } from './mailer.js';
 import { syncInbox } from './inbox.js';
 import { researchLead } from './research.js';
 import { exportCsv, stateKpis, stats } from './reporting.js';
@@ -202,6 +202,15 @@ app.post('/api/campaign/start', asyncRoute(async (req, res) => {
   if (config.sendMode === 'live') {
     const issues = validateLiveSending();
     if (issues.length) return res.status(400).json({ error: 'Envio ao vivo bloqueado.', issues });
+    if (config.requireSentCopy) {
+      const sentMailbox = await verifySentMailbox();
+      if (!sentMailbox.ok) {
+        return res.status(400).json({
+          error: 'Não foi possível validar a cópia na pasta Enviados.',
+          issues: [sentMailbox.reason],
+        });
+      }
+    }
   }
   await activateCampaign();
   res.json({ ok: true, campaign: getState().campaign });

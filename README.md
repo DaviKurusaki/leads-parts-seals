@@ -13,7 +13,8 @@ Sistema preparado para manter uma fila online e segura de prospecção personali
 - Dashboard de aprovação, edição e acompanhamento.
 - Publicação serverless no Netlify, sem computador local ligado.
 - Tela de login, sessão protegida e gestão de usuários administradores/comuns.
-- Envio por SMTP com limite diário, limite por hora, intervalo mínimo e horário comercial.
+- Envio automático em lotes de 5, a cada 15 minutos, todos os dias, das 14:00 às 15:30.
+- Cópia obrigatória de cada mensagem na pasta Enviados acessível pelo Outlook.
 - Modo seguro `dry-run`, que cria prévias em HTML sem enviar mensagens reais.
 - Follow-ups automáticos somente quando não houver resposta, opt-out ou bounce.
 - Sincronização opcional por IMAP para detectar respostas, remoções e devoluções.
@@ -89,8 +90,8 @@ apenas abre o painel novamente.
 
 O site não precisa de servidor local depois de publicado. O Netlify serve o
 painel, executa a API Express como Function e chama o processador da campanha a
-cada minuto. O horário comercial e os limites de envio continuam sendo
-aplicados antes de qualquer mensagem.
+cada 15 minutos. O processador só libera os sete horários diários entre 14:00 e
+15:30 no fuso de São Paulo, com no máximo cinco mensagens em cada lote.
 
 Siga o guia [DEPLOY-NETLIFY.md](DEPLOY-NETLIFY.md). As chaves do Supabase,
 SMTP e IMAP devem ser cadastradas nas variáveis do projeto no Netlify, nunca no
@@ -115,8 +116,10 @@ Preencha `SENDER_EMAIL` e `DKIM_SELECTOR`; execute `verificar-dns.bat`. A ferram
 
 - Aprove manualmente 10 a 20 leads de alta confiança.
 - Envie testes para uma caixa interna.
-- Ative o IMAP para bloquear follow-ups quando houver resposta.
-- Comece com os limites já definidos: 20/dia, 5/hora e 8 minutos entre mensagens.
+- Ative o IMAP para bloquear follow-ups quando houver resposta e salvar cada
+  mensagem em Enviados.
+- A agenda automática permite até 35 mensagens por dia: 5 por lote, a cada 15
+  minutos, todos os dias, das 14:00 às 15:30.
 
 ### 4. Envio ao vivo
 
@@ -162,6 +165,11 @@ O IMAP é recomendado porque interrompe automaticamente a sequência quando:
 - a mensagem volta como endereço inválido.
 
 Preencha `IMAP_*` e use `IMAP_ENABLED=true`. O classificador é conservador: qualquer resposta de um e-mail conhecido pausa os follow-ups e aguarda classificação humana.
+
+Use também `REQUIRE_SENT_COPY=true` e configure `IMAP_SENT_MAILBOX`. Se a cópia
+de uma mensagem não puder ser gravada em Enviados após duas tentativas, o envio
+é registrado, mas a campanha é pausada imediatamente para revisão. A mensagem
+não é repetida automaticamente.
 
 ## Pesquisa web opcional
 

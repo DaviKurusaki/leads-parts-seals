@@ -90,6 +90,11 @@ async function loadConfig() {
   const live = appConfig.sendMode === 'live';
   $('#modeBadge').textContent = live ? 'ENVIO AO VIVO' : 'MODO SEGURO — DRY RUN';
   $('#modeBadge').style.background = live ? 'rgba(55,150,95,.25)' : 'rgba(255,255,255,.12)';
+  const schedule = appConfig.autoBatch;
+  if (schedule) {
+    const days = schedule.everyDay ? 'todos os dias' : 'de segunda a sexta';
+    $('#scheduleSummary').textContent = `Automático: até ${schedule.size} envios a cada ${schedule.intervalMinutes} minutos, ${days}, das ${schedule.start} às ${schedule.end}.`;
+  }
 }
 
 async function loadStats() {

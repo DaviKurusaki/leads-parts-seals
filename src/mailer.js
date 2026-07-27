@@ -89,6 +89,39 @@ async function resolveSentMailbox(client) {
   return mailboxes.find((mailbox) => mailbox.specialUse === '\\Sent')?.path || '';
 }
 
+function createImapClient() {
+  return new ImapFlow({
+    host: config.imap.host,
+    port: config.imap.port,
+    secure: config.imap.secure,
+    auth: { user: config.imap.user, pass: config.imap.pass },
+    connectionTimeout: 7_000,
+    greetingTimeout: 5_000,
+    socketTimeout: 10_000,
+    logger: false,
+  });
+}
+
+export async function verifySentMailbox() {
+  if (!config.imap.enabled) {
+    return { ok: false, mailbox: '', reason: 'IMAP desativado.' };
+  }
+  if (!config.imap.host || !config.imap.user || !config.imap.pass) {
+    return { ok: false, mailbox: '', reason: 'Configuração IMAP incompleta.' };
+  }
+  const client = createImapClient();
+  try {
+    await client.connect();
+    const mailbox = await resolveSentMailbox(client);
+    if (!mailbox) return { ok: false, mailbox: '', reason: 'Pasta de enviados não localizada.' };
+    return { ok: true, mailbox };
+  } catch (error) {
+    return { ok: false, mailbox: '', reason: error.message };
+  } finally {
+    if (client.usable) await client.logout().catch(() => client.close());
+  }
+}
+
 export async function saveLeadCopyToSent(lead, stage, target, {
   messageId = '',
   sentAt = new Date(),
@@ -110,13 +143,7 @@ export async function saveLeadCopyToSent(lead, stage, target, {
     date: sentAt,
   });
 
-  const client = new ImapFlow({
-    host: config.imap.host,
-    port: config.imap.port,
-    secure: config.imap.secure,
-    auth: { user: config.imap.user, pass: config.imap.pass },
-    logger: false,
-  });
+  const client = createImapClient();
 
   try {
     await client.connect();
@@ -127,6 +154,21 @@ export async function saveLeadCopyToSent(lead, stage, target, {
   } finally {
     if (client.usable) await client.logout().catch(() => client.close());
   }
+}
+
+async function saveSentCopyWithRetry(lead, stage, target, options) {
+  let lastError;
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    try {
+      const result = await saveLeadCopyToSent(lead, stage, target, options);
+      if (result.saved) return { ...result, attempts: attempt };
+      lastError = new Error(result.reason || 'A cópia não foi salva.');
+    } catch (error) {
+      lastError = error;
+    }
+    if (attempt < 2) await new Promise((resolve) => setTimeout(resolve, 300));
+  }
+  return { saved: false, attempts: 2, reason: lastError?.message || 'A cópia não foi salva.' };
 }
 
 export async function sendLeadEmail(lead, stage = 0, targetOverride = '') {
@@ -143,15 +185,12 @@ export async function sendLeadEmail(lead, stage = 0, targetOverride = '') {
 
   const sentAt = new Date();
   const info = await getTransporter().sendMail(leadMailOptions(lead, stage, target));
-  let sentCopy;
-  try {
-    sentCopy = await saveLeadCopyToSent(lead, stage, target, {
-      messageId: info.messageId,
-      sentAt,
-    });
-  } catch (error) {
-    console.error(`E-mail enviado, mas a cópia não foi salva na pasta de enviados: ${error.message}`);
-    sentCopy = { saved: false, reason: error.message };
+  const sentCopy = await saveSentCopyWithRetry(lead, stage, target, {
+    messageId: info.messageId,
+    sentAt,
+  });
+  if (!sentCopy.saved) {
+    console.error(`E-mail enviado, mas a cópia não foi salva na pasta de enviados: ${sentCopy.reason}`);
   }
   return {
     messageId: info.messageId,

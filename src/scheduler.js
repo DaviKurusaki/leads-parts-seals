@@ -1,10 +1,11 @@
 import { config } from './config.js';
 import { addEvent, getLead, getState, refreshState, saveState, updateLead } from './store.js';
-import { dateKey, isBusinessWindow, nextStageDueAt } from './businessTime.js';
+import { autoBatchSlot, dateKey, isBusinessWindow, nextStageDueAt } from './businessTime.js';
 import { sendLeadEmail } from './mailer.js';
 import { activeClientMatch } from './activeClients.js';
 import {
   cancelEmailJob,
+  claimBatchSlot,
   completeEmailJob,
   enqueueAndClaimEmailJob,
   failEmailJob,
@@ -12,14 +13,18 @@ import {
 
 let timer = null;
 let running = false;
+let batchRunning = false;
+let lastLocalBatchSlot = '';
 const workerId = `${process.env.COMPUTERNAME || 'parts-seals'}-${process.pid}`;
 
 function sentEvents() {
   return getState().events.filter((event) => event.type === 'email.sent' && !event.dryRun);
 }
 
-export function limitStatus(now = new Date()) {
+export function limitStatus(now = new Date(), overrides = {}) {
   const events = sentEvents();
+  const maxPerDay = overrides.maxPerDay ?? config.limits.maxPerDay;
+  const maxPerHour = overrides.maxPerHour ?? config.limits.maxPerHour;
   const today = dateKey(now);
   const hourAgo = now.getTime() - 60 * 60 * 1000;
   const todayCount = events.filter((e) => dateKey(new Date(e.at)) === today).length;
@@ -29,8 +34,10 @@ export function limitStatus(now = new Date()) {
   return {
     todayCount,
     hourCount,
-    dayReady: todayCount < config.limits.maxPerDay,
-    hourReady: hourCount < config.limits.maxPerHour,
+    maxPerDay,
+    maxPerHour,
+    dayReady: todayCount < maxPerDay,
+    hourReady: hourCount < maxPerHour,
     intervalReady,
   };
 }
@@ -72,20 +79,27 @@ export function nextCandidate(now = new Date()) {
     })[0] || null;
 }
 
-export async function processNext({ ignoreBusinessWindow = false } = {}) {
+export async function processNext({
+  ignoreBusinessWindow = false,
+  ignoreInterval = false,
+  limitOverrides = {},
+} = {}) {
   if (running) return { ok: false, reason: 'Já existe um envio em processamento.' };
   running = true;
   let claimedJob = null;
+  let emailWasSent = false;
   try {
     if (config.dataBackend === 'supabase') await refreshState({ force: true });
     const now = new Date();
     if (!ignoreBusinessWindow && !isBusinessWindow(now)) {
       return { ok: false, reason: 'Fora do horário comercial configurado.' };
     }
-    const limits = limitStatus(now);
+    const limits = limitStatus(now, limitOverrides);
     if (!limits.dayReady) return { ok: false, reason: 'Limite diário atingido.', limits };
     if (!limits.hourReady) return { ok: false, reason: 'Limite por hora atingido.', limits };
-    if (!limits.intervalReady) return { ok: false, reason: 'Intervalo mínimo ainda não concluído.', limits };
+    if (!ignoreInterval && !limits.intervalReady) {
+      return { ok: false, reason: 'Intervalo mínimo ainda não concluído.', limits };
+    }
 
     let lead;
     let stage;
@@ -111,7 +125,9 @@ export async function processNext({ ignoreBusinessWindow = false } = {}) {
 
     if (!lead) return { ok: false, reason: 'Nenhum lead elegível no momento.' };
     const result = await sendLeadEmail(lead, stage);
+    emailWasSent = !result.dryRun;
     const at = new Date().toISOString();
+    let campaignPaused = false;
 
     if (result.dryRun) {
       updateLead(lead.id, {
@@ -130,11 +146,44 @@ export async function processNext({ ignoreBusinessWindow = false } = {}) {
     lead.messageIds = [...(lead.messageIds || []), { stage, at, messageId: result.messageId }];
     getState().campaign.lastSendAt = at;
     addEvent('email.sent', { leadId: lead.id, company: lead.company, email: lead.email, stage, dryRun: result.dryRun, messageId: result.messageId });
-    await saveState();
+
+    if (!result.dryRun && config.requireSentCopy && !result.sentCopy?.saved) {
+      const reason = result.sentCopy?.reason || 'A cópia não foi salva na pasta Enviados.';
+      updateLead(lead.id, {
+        notes: [lead.notes, `Cópia em Enviados falhou: ${reason}`].filter(Boolean).join(' | '),
+      });
+      getState().campaign.active = false;
+      getState().campaign.pausedAt = at;
+      addEvent('email.sentCopy.failed', {
+        leadId: lead.id,
+        company: lead.company,
+        email: lead.email,
+        messageId: result.messageId,
+        reason,
+      });
+      addEvent('campaign.paused', { reason: 'Falha ao salvar cópia em Enviados.' });
+      campaignPaused = true;
+    }
+
     if (claimedJob) await completeEmailJob(claimedJob.id, result.messageId);
-    return { ok: true, leadId: lead.id, company: lead.company, stage, ...result };
+    await saveState();
+    return {
+      ok: true,
+      leadId: lead.id,
+      company: lead.company,
+      stage,
+      campaignPaused,
+      ...result,
+    };
   } catch (error) {
-    if (claimedJob) await failEmailJob(claimedJob.id, error.message).catch(console.error);
+    if (claimedJob && !emailWasSent) {
+      await failEmailJob(claimedJob.id, error.message).catch(console.error);
+    }
+    if (emailWasSent) {
+      getState().campaign.active = false;
+      getState().campaign.pausedAt = new Date().toISOString();
+      addEvent('campaign.paused', { reason: 'Falha após confirmação do envio; revisão manual necessária.' });
+    }
     addEvent('email.error', { message: error.message });
     await saveState();
     return { ok: false, reason: error.message };
@@ -143,11 +192,75 @@ export async function processNext({ ignoreBusinessWindow = false } = {}) {
   }
 }
 
+export async function processScheduledBatch({ now = new Date() } = {}) {
+  if (batchRunning) return { ok: true, skipped: 'Já existe um lote em processamento.' };
+  batchRunning = true;
+  try {
+    if (config.dataBackend === 'supabase') await refreshState({ force: true });
+    if (!getState().campaign.active) return { ok: true, skipped: 'Campanha pausada.' };
+
+    const slot = autoBatchSlot(now);
+    if (!slot) return { ok: true, skipped: 'Fora da agenda automática.' };
+
+    let claimed = false;
+    if (config.dataBackend === 'supabase') {
+      claimed = await claimBatchSlot(slot.key, now);
+    } else if (lastLocalBatchSlot !== slot.key) {
+      lastLocalBatchSlot = slot.key;
+      claimed = true;
+    }
+    if (!claimed) return { ok: true, skipped: 'Este lote já foi processado.', slot: slot.key };
+
+    addEvent('email.batch.started', { slot: slot.key, batchSize: config.autoBatch.size });
+    const results = [];
+    let stoppedReason = '';
+    for (let index = 0; index < config.autoBatch.size; index += 1) {
+      const result = await processNext({
+        ignoreBusinessWindow: true,
+        ignoreInterval: true,
+        limitOverrides: {
+          maxPerDay: config.autoBatch.maxPerDay,
+          maxPerHour: config.autoBatch.maxPerHour,
+        },
+      });
+      if (!result.ok) {
+        stoppedReason = result.reason;
+        break;
+      }
+      results.push({
+        leadId: result.leadId,
+        company: result.company,
+        stage: result.stage,
+        dryRun: result.dryRun,
+        sentCopySaved: result.sentCopy?.saved ?? null,
+      });
+      if (result.campaignPaused) {
+        stoppedReason = 'Campanha pausada porque a cópia em Enviados falhou.';
+        break;
+      }
+    }
+    addEvent('email.batch.completed', {
+      slot: slot.key,
+      requested: config.autoBatch.size,
+      processed: results.length,
+      stoppedReason,
+    });
+    await saveState();
+    return {
+      ok: true,
+      slot: slot.key,
+      requested: config.autoBatch.size,
+      processed: results.length,
+      stoppedReason: stoppedReason || null,
+      results,
+    };
+  } finally {
+    batchRunning = false;
+  }
+}
+
 async function tick() {
-  if (config.dataBackend === 'supabase') await refreshState({ force: true });
-  const state = getState();
-  if (!state.campaign.active) return;
-  await processNext();
+  await processScheduledBatch();
 }
 
 export function startScheduler() {

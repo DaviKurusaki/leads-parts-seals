@@ -9,7 +9,7 @@
   included_files = ["output/pdf/**", "config/**", "prompts/**"]
 
 [functions."campaign-runner"]
-  schedule = "* * * * *"
+  schedule = "*/15 * * * *"
 
 [[redirects]]
   from = "/api/*"

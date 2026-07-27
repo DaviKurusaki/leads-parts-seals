@@ -22,6 +22,22 @@ export function isBusinessWindow(date = new Date()) {
   return current >= minutes(config.limits.businessStart) && current <= minutes(config.limits.businessEnd);
 }
 
+export function autoBatchSlot(date = new Date()) {
+  const p = partsInTimezone(date);
+  if (!config.autoBatch.everyDay && ['Sat', 'Sun'].includes(p.weekday)) return null;
+  const current = Number(p.hour) * 60 + Number(p.minute);
+  const start = minutes(config.autoBatch.start);
+  const end = minutes(config.autoBatch.end);
+  const interval = Math.max(config.autoBatch.intervalMinutes, 1);
+  if (current < start || current > end || (current - start) % interval !== 0) return null;
+  const minute = String(p.minute).padStart(2, '0');
+  const hour = String(p.hour).padStart(2, '0');
+  return {
+    key: `${p.year}-${p.month}-${p.day}T${hour}:${minute}`,
+    startAt: new Date(date.getTime() - Number(p.second || 0) * 1000 - date.getUTCMilliseconds()),
+  };
+}
+
 export function dateKey(date = new Date()) {
   const p = partsInTimezone(date);
   return `${p.year}-${p.month}-${p.day}`;

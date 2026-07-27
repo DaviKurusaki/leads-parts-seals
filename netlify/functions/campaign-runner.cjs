@@ -2,7 +2,7 @@ let initialization;
 
 exports.handler = async function handler() {
   const [
-    { processNext },
+    { processScheduledBatch },
     { getState, loadState, refreshState },
   ] = await Promise.all([
     import('../../src/scheduler.js'),
@@ -16,7 +16,7 @@ exports.handler = async function handler() {
     return { statusCode: 200, body: JSON.stringify({ ok: true, skipped: 'Campanha pausada.' }) };
   }
 
-  const result = await processNext();
+  const result = await processScheduledBatch();
   return {
     statusCode: result.ok ? 200 : 202,
     body: JSON.stringify(result),
