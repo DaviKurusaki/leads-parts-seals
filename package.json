@@ -9,7 +9,7 @@
     "dev": "node --watch src/server.js",
     "dns": "node src/dnsCheck.js",
     "test": "node --test tests/*.test.js",
-    "check": "node --check src/server.js && node --check src/scheduler.js && node --check src/inbox.js && node --check src/mailer.js && node --check src/workbook.js && node --check src/reporting.js && node --check scripts/collect_rfb_candidates.mjs && node --check scripts/validate_select_candidates.mjs && node --check scripts/build_rfb_lead_seed.mjs && node --check public/app.js",
+    "check": "node --check src/server.js && node --check src/activeClients.js && node --check src/scheduler.js && node --check src/inbox.js && node --check src/mailer.js && node --check src/workbook.js && node --check src/reporting.js && node --check scripts/collect_rfb_candidates.mjs && node --check scripts/validate_select_candidates.mjs && node --check scripts/build_rfb_lead_seed.mjs && node --check public/app.js",
     "research": "node src/researchBatch.js"
   },
   "dependencies": {

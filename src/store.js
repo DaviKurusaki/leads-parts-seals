@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { config } from './config.js';
 import { readCampaignWorkbook } from './workbook.js';
+import { filterActiveClients } from './activeClients.js';
 
 let state = null;
 let writeChain = Promise.resolve();
@@ -24,13 +25,15 @@ async function applyLeadSeed(currentState) {
     && lead.email
   ));
   const existingEmails = new Set(preserved.map((lead) => lead.email.toLowerCase()));
-  const additions = seed.leads.filter((lead) => !existingEmails.has(lead.email.toLowerCase()));
+  const seedAdditions = seed.leads.filter((lead) => !existingEmails.has(lead.email.toLowerCase()));
+  const { kept: additions, suppressed } = await filterActiveClients(seedAdditions);
   currentState.leads = [...preserved, ...additions];
   currentState.leadSeedVersion = seed.version;
   addEvent('leads.seedApplied', {
     source: seed.source,
     preserved: preserved.length,
     additions: additions.length,
+    activeClientsSuppressed: suppressed.length,
     total: currentState.leads.length,
   });
   return true;
@@ -67,15 +70,33 @@ export async function saveState() {
 
 export async function loadState() {
   if (state) return state;
+  let changed = false;
   try {
     state = JSON.parse(await fs.readFile(config.stateFile, 'utf8'));
   } catch (error) {
     if (error.code !== 'ENOENT') throw error;
     const leads = await readCampaignWorkbook();
-    state = initialState(leads);
+    const { kept, suppressed } = await filterActiveClients(leads);
+    state = initialState(kept);
+    if (suppressed.length) {
+      addEvent('leads.activeClientsSuppressed', {
+        count: suppressed.length,
+        leads: suppressed,
+      });
+    }
     await saveState();
   }
-  if (await applyLeadSeed(state)) await saveState();
+  const current = await filterActiveClients(state.leads);
+  if (current.suppressed.length) {
+    state.leads = current.kept;
+    addEvent('leads.activeClientsSuppressed', {
+      count: current.suppressed.length,
+      leads: current.suppressed,
+    });
+    changed = true;
+  }
+  if (await applyLeadSeed(state)) changed = true;
+  if (changed) await saveState();
   return state;
 }
 
@@ -104,7 +125,14 @@ export function addEvent(type, details = {}) {
 
 export async function resetFromWorkbook() {
   const leads = await readCampaignWorkbook();
-  state = initialState(leads);
+  const { kept, suppressed } = await filterActiveClients(leads);
+  state = initialState(kept);
+  if (suppressed.length) {
+    addEvent('leads.activeClientsSuppressed', {
+      count: suppressed.length,
+      leads: suppressed,
+    });
+  }
   await applyLeadSeed(state);
   await saveState();
   return state;

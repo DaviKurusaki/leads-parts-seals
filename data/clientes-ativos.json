@@ -1,0 +1,699 @@
+{
+  "source": "Clientes (1).xlsx",
+  "generatedAt": "2026-07-27",
+  "clients": [
+    {
+      "code": "439",
+      "name": "ALIANCA VEDACOES E COMERCIO DE BORRACHAS LTDA.",
+      "legalName": "ALIANCA VEDACOES E COMERCIO DE BORRACHAS LTDA.",
+      "city": "BELO HORIZONTE/MG",
+      "cnpj": "45556300000190",
+      "email": "vendas1@aliancavedacoes.com.br",
+      "site": ""
+    },
+    {
+      "code": "377",
+      "name": "BAVEMAN MANUTENCAO E COMERCIO HIDRAULICO LTDA",
+      "legalName": "BAVEMAN MANUTENCAO E COMERCIO HIDRAULICO LTDA",
+      "city": "FEIRA DE SANTANA/BA",
+      "cnpj": "27683737000293",
+      "email": "baveman.feira@baveman.com.br",
+      "site": ""
+    },
+    {
+      "code": "382",
+      "name": "BAVEMAN MANUTENCAO E COMERCIO HIDRAULICO LTDA - EPP",
+      "legalName": "BAVEMAN MANUTENCAO E COMERCIO HIDRAULICO LTDA",
+      "city": "CAMAÇARI/BA",
+      "cnpj": "27683737000102",
+      "email": "baveman@baveman.com.br",
+      "site": ""
+    },
+    {
+      "code": "201",
+      "name": "BH VEDAÇOES COM DE BORRACHAS LTDA",
+      "legalName": "BH VEDAÇOES COM DE BORRACHAS LTDA",
+      "city": "BELO HORIZONTE/MG",
+      "cnpj": "",
+      "email": "financeirobh@bhvedacoes.com.br",
+      "site": ""
+    },
+    {
+      "code": "359",
+      "name": "CRC COMERCIO DE VEDACOES LTDA - ME",
+      "legalName": "CRC COMERCIO DE VEDACOES LTDA - ME",
+      "city": "JUNDIAÍ/SP",
+      "cnpj": "26851309000189",
+      "email": "claudio@crcvedaçoes.com.br",
+      "site": ""
+    },
+    {
+      "code": "394",
+      "name": "CSK HIDRAULICA SOLUTION EIRELI",
+      "legalName": "CSK HIDRAULICA SOLUTION EIRELI",
+      "city": "SERRA/ES",
+      "cnpj": "",
+      "email": "compras.csk@sealtecnica.com.br",
+      "site": ""
+    },
+    {
+      "code": "433",
+      "name": "D E W VEDACOES LTDA (INOVED)",
+      "legalName": "D & W VEDACOES LTDA",
+      "city": "GUAPIACU/SP",
+      "cnpj": "47082222000164",
+      "email": "inoved@inoved.com.br",
+      "site": "www.inoved.com.br"
+    },
+    {
+      "code": "344",
+      "name": "DNA VEDACOES",
+      "legalName": "DNA VEDACOES TECNICAS LTDA",
+      "city": "SÃO PAULO/SP",
+      "cnpj": "",
+      "email": "",
+      "site": ""
+    },
+    {
+      "code": "523",
+      "name": "EAC VEDACOES",
+      "legalName": "55.879.299 ELIONOR ARAUJO COSTA",
+      "city": "PORTO ALEGRE/RS",
+      "cnpj": "55879299000198",
+      "email": "araujo.arauved@outlook.com.br",
+      "site": ""
+    },
+    {
+      "code": "257",
+      "name": "EACP VEDACOES E ACESSÓRIOS INDUSTRIAIS LTDA-ME",
+      "legalName": "EACP VEDACOES E ACESSÓRIOS INDUSTRIAIS LTDA-ME",
+      "city": "INDAIATUBA/SP",
+      "cnpj": "",
+      "email": "contato.eacp@gmail.com",
+      "site": ""
+    },
+    {
+      "code": "323",
+      "name": "FERVEC COMERCIO DE VEDACOES E ACESSORIOS INDUSTRIAIS LTDA",
+      "legalName": "FERVEC COMERCIO DE VEDACOES E ACESSORIOS INDUSTRIAIS LTDA",
+      "city": "SÃO BERNARDO DO CAMPO/SP",
+      "cnpj": "29626029000165",
+      "email": "fernando.cesario@fervec.com.br",
+      "site": "www.fervec.com.br"
+    },
+    {
+      "code": "304",
+      "name": "FMX COMERCIO DE VEDACOES EIRELE ME",
+      "legalName": "FMX COMERCIO DE VEDACOES EIRELE ME",
+      "city": "RIBEIRÃO PRETO/SP",
+      "cnpj": "",
+      "email": "vendas@fmxvedacoes.com.br",
+      "site": ""
+    },
+    {
+      "code": "418",
+      "name": "GCM VEDACOES E ACESSORIOS INDUSTRIAIS LTDA",
+      "legalName": "GCM VEDACOES E ACESSORIOS INDUSTRIAIS LTDA",
+      "city": "CAMPINAS/SP",
+      "cnpj": "42429502000182",
+      "email": "vendas1@gcmacessorios.com.br",
+      "site": "www.gcmacessorios.com.br"
+    },
+    {
+      "code": "459",
+      "name": "GOOD SEAL COM. VED. INDS. LTDA",
+      "legalName": "GOOD SEAL COM. VED. INDS. LTDA - EPP",
+      "city": "SÃO CAETANO DO SUL/SP",
+      "cnpj": "",
+      "email": "goodseal2@gmail.com",
+      "site": ""
+    },
+    {
+      "code": "350",
+      "name": "GSHIDRAU HIDRAULICA E PNEUMÁTICA LTDA",
+      "legalName": "GSHIDRAU HIDRAULICA E PNEUMÁTICA LTDA",
+      "city": "PIRACICABA/SP",
+      "cnpj": "",
+      "email": "anderson@gshidrau.com.br",
+      "site": ""
+    },
+    {
+      "code": "428",
+      "name": "GW INDUSTRIA E COMERCIO LTDA",
+      "legalName": "GW INDUSTRIA E COMERCIO LTDA - EPP",
+      "city": "SÃO PAULO/SP",
+      "cnpj": "17188468000154",
+      "email": "engenharia@gwpecas.com.br",
+      "site": "www.gwpecas.com.br"
+    },
+    {
+      "code": "279",
+      "name": "HF COMERCIO DE VEDAÇÕES LTDA",
+      "legalName": "HF COMERCIO DE VEDAÇÕES LTDA",
+      "city": "SERRA/ES",
+      "cnpj": "",
+      "email": "compras@hfvedacoes.com.br",
+      "site": ""
+    },
+    {
+      "code": "334",
+      "name": "INOVED SOLUCOES INDUSTRIAIS LTDA - ME",
+      "legalName": "INOVED SOLUCOES INDUSTRIAIS LTDA - ME",
+      "city": "GUAPIAÇU/SP",
+      "cnpj": "19583510000167",
+      "email": "",
+      "site": ""
+    },
+    {
+      "code": "510",
+      "name": "INTERVED SUPRIMENTOS",
+      "legalName": "INTERVED SUPRIMENTOS",
+      "city": "SOROCABA/SP",
+      "cnpj": "",
+      "email": "",
+      "site": ""
+    },
+    {
+      "code": "407",
+      "name": "JEA COMERCIO DE PEÇAS HIDRÁULICAS E PNEUMATICAS LTDA",
+      "legalName": "JEA COMERCIO DE PEÇAS HIDRÁULICAS E PNEUMATICAS LTDA",
+      "city": "SÃO JOSÉ DOS CAMPOS/SP",
+      "cnpj": "45336949000103",
+      "email": "vendas@ecpvedacoes.com.br",
+      "site": ""
+    },
+    {
+      "code": "449",
+      "name": "JMA EQUIPAMENTOS HIDRAULICOS LTDA",
+      "legalName": "JMA EQUIPAMENTOS HIDRAULICOS LTDA",
+      "city": "PIRACICABA/SP",
+      "cnpj": "48742289000140",
+      "email": "jmahidraulicos@gamil.com",
+      "site": ""
+    },
+    {
+      "code": "445",
+      "name": "JMA VEDACOES LTDA (FILIAL)",
+      "legalName": "JMA VEDACOES LTDA",
+      "city": "LINHARES/ES",
+      "cnpj": "11985320000245",
+      "email": "comercial.linhares@jmavedacoes.com.br",
+      "site": ""
+    },
+    {
+      "code": "388",
+      "name": "JMA VEDAÇÕES LTDA ME",
+      "legalName": "JMA Vedações Ltda Me",
+      "city": "SERRA/ES",
+      "cnpj": "11985320000164",
+      "email": "comercial@jmavedacoes.com.br",
+      "site": "https://jmavedacoes.com.br/"
+    },
+    {
+      "code": "509",
+      "name": "JOINVILLE VEDACOES",
+      "legalName": "JOINVILLE VEDACOES LTDA",
+      "city": "JOINVILLE/SC",
+      "cnpj": "55248160000146",
+      "email": "joinvillevedacoes@joinvillevedacoes.com.br",
+      "site": "joinvillevedacoes.com.br"
+    },
+    {
+      "code": "137",
+      "name": "JSL EQUIPAMENTOS HIDRAULICOS LTDA - EPP CAMPINAS",
+      "legalName": "JSL EQUIPAMENTOS HIDRAULICOS LTDA - EPP",
+      "city": "CAMPINAS/SP",
+      "cnpj": "",
+      "email": "jsl.campinas@jslvedacoes.com.br",
+      "site": "https://www.jslvedacoes.com.br/"
+    },
+    {
+      "code": "13",
+      "name": "JSL EQUIPAMENTOS HIDRAULICOS LTDA - EPP S.B.O",
+      "legalName": "JSL EQUIPAMENTOS HIDRAULICOS LTDA - EPP",
+      "city": "SANTA BÁRBARA D'OESTE/SP",
+      "cnpj": "",
+      "email": "vendas@jslvedacoes..com.br",
+      "site": "https://www.jslvedacoes.com.br/"
+    },
+    {
+      "code": "139",
+      "name": "JSL HIDRAULICA E PNEUMATICA LTDA",
+      "legalName": "JSL  HIDRAULICA E PNEUMATICA LT",
+      "city": "SANTA BÁRBARA D'OESTE/SP",
+      "cnpj": "67685792000156",
+      "email": "financeiro@jslhidraulica.com.br",
+      "site": ""
+    },
+    {
+      "code": "299",
+      "name": "KAELVED INDUSTRIA E COMERCIO LTDA",
+      "legalName": "KAEL VEDACOES",
+      "city": "CAMPINAS/SP",
+      "cnpj": "26837418000141",
+      "email": "comercial@kaelved.com.br",
+      "site": ""
+    },
+    {
+      "code": "302",
+      "name": "LOJA DAS VEDACOES LTDA",
+      "legalName": "LOJA DAS VEDACOES LTDA",
+      "city": "BELO HORIZONTE/MG",
+      "cnpj": "18968185000198",
+      "email": "",
+      "site": ""
+    },
+    {
+      "code": "483",
+      "name": "M A ASSISTENCIA TECNICA EM HIDRAULICA E PNEUMATICO",
+      "legalName": "M A ASSISTENCIA TECNICA EM HIDRAULICA E PNEUMATICO LTDA",
+      "city": "SANTA BÁRBARA D'OESTE/SP",
+      "cnpj": "40549191000160",
+      "email": "comercial@mahidraulica.com.br",
+      "site": ""
+    },
+    {
+      "code": "397",
+      "name": "MAC-CROMO METALÚRGICA LTDA",
+      "legalName": "MAC - CROMO METALÚRGICA LTDA-EPP",
+      "city": "SANTA BÁRBARA D'OESTE/SP",
+      "cnpj": "10209957000104",
+      "email": "marcio@mac-cromo.com.br",
+      "site": ""
+    },
+    {
+      "code": "514",
+      "name": "MASTER FLUIDO COMPONENTES",
+      "legalName": "MASTER FLUIDO COMPONENTES VEDACOES DE PRECISAO LTDA",
+      "city": "SERRA/ES",
+      "cnpj": "59862892000182",
+      "email": "vendas@masterfluido.com.br",
+      "site": "www.masterfluido.com.br"
+    },
+    {
+      "code": "494",
+      "name": "MASTER FLUIDO COMPONENTES INDUSTRIAIS",
+      "legalName": "MASTER FLUIDO COMPONENTES INDUSTRIAIS LTDA",
+      "city": "CONTAGEM/MG",
+      "cnpj": "22104908000188",
+      "email": "vendas@masterfluido.com.br",
+      "site": ""
+    },
+    {
+      "code": "529",
+      "name": "MC SEALS - SOLUCOES INDUSTRIAIS LTDA",
+      "legalName": "MC SEALS - SOLUCOES INDUSTRIAIS LTDA",
+      "city": "LAURO DE FREITAS/BA",
+      "cnpj": "41098870000122",
+      "email": "vendas@mcseals.com.br",
+      "site": ""
+    },
+    {
+      "code": "149",
+      "name": "MESTRA VEDACOES E ROLAMENTOS LTDA",
+      "legalName": "MESTRA VEDACOES E ROLAMENTOS LTDA",
+      "city": "JUNDIAÍ/SP",
+      "cnpj": "",
+      "email": "compras2@mestrasuprimentos.com.br",
+      "site": "mestrasuprimentos.com.br"
+    },
+    {
+      "code": "362",
+      "name": "METALRING VEDACOES LTDA",
+      "legalName": "METAL RING VEDACOES LTDA",
+      "city": "PORTO ALEGRE/RS",
+      "cnpj": "",
+      "email": "vanessa@metalring.com.br",
+      "site": "www.metalring.com.br"
+    },
+    {
+      "code": "470",
+      "name": "METALRING VEDACOES LTDA - FILIAL",
+      "legalName": "METALRING VEDACOES LTDA",
+      "city": "ILHOTA/SC",
+      "cnpj": "",
+      "email": "vanessa@metalring.com.br",
+      "site": ""
+    },
+    {
+      "code": "422",
+      "name": "MULT RUBBER VEDACOES INDUSTRIAIS LTDA",
+      "legalName": "MULT RUBBER VEDACOES INDUSTRIAIS LTDA",
+      "city": "SÃO PAULO/SP",
+      "cnpj": "72995491000169",
+      "email": "",
+      "site": ""
+    },
+    {
+      "code": "432",
+      "name": "MULT TECNOLOGIA EM VEDACOES LTDA",
+      "legalName": "MULT TECNOLOGIA EM VEDACOES LTDA",
+      "city": "SÃO PAULO/SP",
+      "cnpj": "46059246000130",
+      "email": "",
+      "site": ""
+    },
+    {
+      "code": "450",
+      "name": "MUNDIAL VEDACOES HIDRAULICA LTDA",
+      "legalName": "MUNDIAL VEDACOES HIDRAULICA LTDA",
+      "city": "DIVINÓPOLIS/MG",
+      "cnpj": "46865219000154",
+      "email": "compras@mundialvedacoes.com.br",
+      "site": ""
+    },
+    {
+      "code": "372",
+      "name": "NORDESTE RETENTORES LTDA",
+      "legalName": "NORDESTE RETENTORES LTDA",
+      "city": "SIMÕES FILHO/BA",
+      "cnpj": "23735774000166",
+      "email": "jvitoria@live.com",
+      "site": ""
+    },
+    {
+      "code": "469",
+      "name": "ONIX INDUSTRIAL",
+      "legalName": "ONIX COMERCIO DE ACESSORIOS INDUSTRIAIS LTDA",
+      "city": "CAMPINAS/SP",
+      "cnpj": "20083223000177",
+      "email": "contato@onixindustrial.com.br",
+      "site": "www.onixindustrial.com.br"
+    },
+    {
+      "code": "501",
+      "name": "OPEN SOLUCOES",
+      "legalName": "OPEN VIA COMERCIAL LIMITADA",
+      "city": "LAURO DE FREITAS/BA",
+      "cnpj": "",
+      "email": "expressoservicos@hotmail.com",
+      "site": ""
+    },
+    {
+      "code": "389",
+      "name": "PAMAG COMERCIO E SERVIÇOS DE ACESSORIOS INDUSTRIAIS LTDA",
+      "legalName": "PAMAG COMERCIO E SERVIÇOS DE ACESSORIOS INDUSTRIAIS LTDA",
+      "city": "CAMPINAS/SP",
+      "cnpj": "33610628000249",
+      "email": "contato@pamag.com.br",
+      "site": "www.pamag.com.br"
+    },
+    {
+      "code": "462",
+      "name": "PARA VEDACOES E ROLAMENTOS - FILIAL",
+      "legalName": "W L COMERCIO DE PEÇAS E ACESSORIOS LTDA - FILIAL",
+      "city": "BARCARENA/PA",
+      "cnpj": "29748602000294",
+      "email": "paravedacoeserolamentos@outlook.com",
+      "site": ""
+    },
+    {
+      "code": "355",
+      "name": "PARA VEDACOES E ROLAMENTOS LTDA",
+      "legalName": "W.L. COMERCIO DE PECAS E ACESSORIOS LTDA",
+      "city": "MARITUBA/PA",
+      "cnpj": "29748602000103",
+      "email": "",
+      "site": ""
+    },
+    {
+      "code": "463",
+      "name": "PARA VEDACOES E ROLAMENTOS LTDA",
+      "legalName": "W.L.M COMERCIO PECAS E ACESSORIOS LTDA",
+      "city": "RIO VERDE/GO",
+      "cnpj": "29748602000375",
+      "email": "paravedacoeserolamentos@outlook.com",
+      "site": ""
+    },
+    {
+      "code": "527",
+      "name": "PORTO VEDACOES - COM DE PECAS INDUSTRIAIS LTDA",
+      "legalName": "PORTO VEDACOES - COM DE PECAS INDUSTRIAIS LTDA",
+      "city": "PORTO ALEGRE/RS",
+      "cnpj": "55420305000144",
+      "email": "",
+      "site": ""
+    },
+    {
+      "code": "513",
+      "name": "QUALISEALS COMERCIO DE VEDACOES",
+      "legalName": "QUALISEALS COMERCIO DE VEDACOES LTDA",
+      "city": "GUARULHOS/SP",
+      "cnpj": "63737700000183",
+      "email": "adm@qualiseals.com.br",
+      "site": ""
+    },
+    {
+      "code": "515",
+      "name": "QUALITY SEALS LTDA",
+      "legalName": "QUALITY SEALS LTDA",
+      "city": "BETIM/MG",
+      "cnpj": "61190066000186",
+      "email": "vendas1@qualityseals.com.br",
+      "site": ""
+    },
+    {
+      "code": "423",
+      "name": "QUALIVED QUALIDADE EM VEDACOES LTDA",
+      "legalName": "QUALIVED QUALIDADE EM VEDAÇÕES LTDA.",
+      "city": "GUARULHOS/SP",
+      "cnpj": "",
+      "email": "qualived@qualived.com.br",
+      "site": ""
+    },
+    {
+      "code": "530",
+      "name": "RAFAEL ALAN DE OLIVEIRA 35594166807",
+      "legalName": "RAFAEL ALAN DE OLIVEIRA 35594166807",
+      "city": "AMERICANA/SP",
+      "cnpj": "37397623000150",
+      "email": "bisquiypvs@hotmail.com",
+      "site": ""
+    },
+    {
+      "code": "179",
+      "name": "RM GOLFI-ME",
+      "legalName": "RM GOLFI-ME",
+      "city": "AMERICANA/SP",
+      "cnpj": "",
+      "email": "nfe@rmgolfi.com.br",
+      "site": ""
+    },
+    {
+      "code": "465",
+      "name": "RPSEALS COMERCIO DE VEDACOES INDUSTRIAIS",
+      "legalName": "RPSEALS COMERCIO DE VEDACOES INDUSTRIAIS LTDA",
+      "city": "PIRACICABA/SP",
+      "cnpj": "53290917000134",
+      "email": "contato@rpseals.com.br",
+      "site": "www.rpseals.com.br"
+    },
+    {
+      "code": "312",
+      "name": "SEAL TECNICA VEDACOES LTDA",
+      "legalName": "SEAL TECNICA VEDACOES LTDA EPP",
+      "city": "SERRA/ES",
+      "cnpj": "",
+      "email": "",
+      "site": ""
+    },
+    {
+      "code": "297",
+      "name": "SEALMINAS INDUSTRIA E COMERCIO DE VEDAÇÕES LTDA",
+      "legalName": "SEALMINAS INDUSTRIA E COMERCIO DE VEDACOES LTDA - EPP",
+      "city": "BELO HORIZONTE/MG",
+      "cnpj": "",
+      "email": "sealminas@sealminas.com.br",
+      "site": "www.sealminas.com.br"
+    },
+    {
+      "code": "392",
+      "name": "SHVED SOLUÇÕES",
+      "legalName": "SHVED SOLUÇÕES",
+      "city": "RAFARD/SP",
+      "cnpj": "",
+      "email": "shvedsolucoes@hotmail.com",
+      "site": ""
+    },
+    {
+      "code": "373",
+      "name": "SISTENDRAU - SISTEMAS HIDRAULICOS E PNEUMATICOS INDUSTRIAIS",
+      "legalName": "SISTENDRAU - SISTEMAS HIDRAULICOS E PNEUMATICOS LTDA",
+      "city": "SANTA BÁRBARA D'OESTE/SP",
+      "cnpj": "10308309000105",
+      "email": "sistendrau@sistendrau.com.br",
+      "site": "http://www.sistendrau.com.br/"
+    },
+    {
+      "code": "467",
+      "name": "SP SEALS  (GRUPO VEDALL)",
+      "legalName": "SP SEALS DISTRIBUIDORA LTDA",
+      "city": "SÃO PAULO/SP",
+      "cnpj": "48292639000114",
+      "email": "vendas01@vedall.com.br",
+      "site": ""
+    },
+    {
+      "code": "404",
+      "name": "SP SUPRIMENTOS INDUSTRIAIS LTDA",
+      "legalName": "SP SUPRIMENTOS INDUSTRIAIS LTDA",
+      "city": "GUARULHOS/SP",
+      "cnpj": "39924511000135",
+      "email": "contato@suprimentossp.com.br",
+      "site": "www.suprimentossp.com.br"
+    },
+    {
+      "code": "436",
+      "name": "SRR SOLUCOES INDUSTRIAIS LTDA",
+      "legalName": "SRR SOLUCOES INDUSTRIAIS LTDA",
+      "city": "CAXIAS DO SUL/RS",
+      "cnpj": "",
+      "email": "srr@srr.ind.br",
+      "site": "www.srr.ind.br"
+    },
+    {
+      "code": "520",
+      "name": "SUPREVED SUPRIMENTOS E VEDACOES INDUSTRIAIS LTDA",
+      "legalName": "SUPREVED SUPRIMENTOS E VEDACOES INDUSTRIAIS LTDA",
+      "city": "SOROCABA/SP",
+      "cnpj": "63967765000115",
+      "email": "",
+      "site": ""
+    },
+    {
+      "code": "486",
+      "name": "USINA VEDACOES ACESSORIOS INDUSTRIAIS",
+      "legalName": "USINA VEDACOES ACESSORIOS INDUSTRIAIS LTDA - ME",
+      "city": "MARINGÁ/PR",
+      "cnpj": "13793494000401",
+      "email": "faturamento@usinavedacoes.com.br",
+      "site": ""
+    },
+    {
+      "code": "448",
+      "name": "USINA VEDACOES ACESSORIOS INDUSTRIAIS LTDA",
+      "legalName": "USINA VEDACOES ACESSORIOS INDUSTRIAIS LTDA",
+      "city": "RIO VERDE/GO",
+      "cnpj": "13793494000231",
+      "email": "financeiro@usinavedacoes.com.br",
+      "site": ""
+    },
+    {
+      "code": "317",
+      "name": "USINA VEDACOES E ACESSORIOS INDUSTRIAIS LTDA  - ME",
+      "legalName": "USINA VEDACOES E ACESSORIOS INDUSTRIAIS LTDA  - ME",
+      "city": "SERTÃOZINHO/SP",
+      "cnpj": "13793494000150",
+      "email": "faturamento@usinavedacoes.com.br",
+      "site": ""
+    },
+    {
+      "code": "531",
+      "name": "VALE SEALS COMERCIO E SERVICOS DE VEDACOES LTDA",
+      "legalName": "VALE SEALS COMERCIO E SERVICOS DE VEDACOES LTDA",
+      "city": "JACAREÍ/SP",
+      "cnpj": "",
+      "email": "contato@valeseals.com.br",
+      "site": ""
+    },
+    {
+      "code": "21",
+      "name": "VED PIRA COMERCIO DE VEDACOES HIDRAULICAS E PNEUMATICAS LTDA",
+      "legalName": "VED PIRA COMERCIO DE VEDACOES HIDRAULICAS E PNEUMATICAS LTDA",
+      "city": "PIRACICABA/SP",
+      "cnpj": "12960573000146",
+      "email": "",
+      "site": ""
+    },
+    {
+      "code": "212",
+      "name": "VEDACOES MAKITA ACESSORIOS INDUSTR LT CAMPINAS",
+      "legalName": "VEDACOES MAKITA ACESSORIOS INDUSTR LT",
+      "city": "CAMPINAS/SP",
+      "cnpj": "52868510000189",
+      "email": "",
+      "site": ""
+    },
+    {
+      "code": "200",
+      "name": "VEDACOES MAKITA ACESSORIOS INDUSTR LT SOROCABA",
+      "legalName": "VEDACOES MAKITA ACESSORIOS INDUSTR LT",
+      "city": "SOROCABA/SP",
+      "cnpj": "52868510000340",
+      "email": "l.angelo@vedacoesmakita.com.br",
+      "site": ""
+    },
+    {
+      "code": "307",
+      "name": "VEDACOES NGS",
+      "legalName": "VEDACOES NGS LTDA",
+      "city": "BELO HORIZONTE/MG",
+      "cnpj": "14053593000169",
+      "email": "",
+      "site": ""
+    },
+    {
+      "code": "468",
+      "name": "VEDALL",
+      "legalName": "VEDALL PECAS E ACESSORIOS INDUSTRIAIS LTDA",
+      "city": "SÃO PAULO/SP",
+      "cnpj": "52555645000194",
+      "email": "caio@vedall.com.br",
+      "site": "www.vedall.com.br"
+    },
+    {
+      "code": "521",
+      "name": "VEDALL VEDACOES INDUSTRIAIS LTDA",
+      "legalName": "VEDALL VEDACOES INDUSTRIAIS LTDA",
+      "city": "GUARULHOS/SP",
+      "cnpj": "13305697000150",
+      "email": "",
+      "site": ""
+    },
+    {
+      "code": "524",
+      "name": "VEDALL VEDACOES INDUSTRIAIS LTDA",
+      "legalName": "VEDALL VEDACOES INDUSTRIAIS LTDA",
+      "city": "ITAQUAQUECETUBA/SP",
+      "cnpj": "13305697000231",
+      "email": "",
+      "site": ""
+    },
+    {
+      "code": "369",
+      "name": "VEDAMASTER SOLUCOES EM VEDACOES LTDA",
+      "legalName": "MASTERVEDA SOLUCOES EM VEDACOES LTDA",
+      "city": "PORTO ALEGRE/RS",
+      "cnpj": "17663740000100",
+      "email": "vagner@masterveda.com.br",
+      "site": "www.masterveda.com.br"
+    },
+    {
+      "code": "497",
+      "name": "VEDAPARTS SUPRIMENTOS INDUSTRIAIS LTDA",
+      "legalName": "VEDAPARTS SUPRIMENTOS INDUSTRIAIS LTDA",
+      "city": "GUARULHOS/SP",
+      "cnpj": "59620087000142",
+      "email": "",
+      "site": ""
+    },
+    {
+      "code": "471",
+      "name": "VEDFILTER FILTROS E ACESSORIOS INDUSTRIAIS",
+      "legalName": "E B PEREIRA COMERCIO DE VEDACOES, FILTROS E ACES INDUSTRIAIS",
+      "city": "BARRA MANSA/RJ",
+      "cnpj": "13632459000150",
+      "email": "vedfilter@yahoo.com.br",
+      "site": ""
+    },
+    {
+      "code": "386",
+      "name": "ZOTELLI COMÉRCIO DE VEDAÇÕES HIDRÁULICAS E PNEUMÁTICAS LTDA",
+      "legalName": "ZOTELLI COMÉRCIO DE VEDAÇÕES HIDRÁULICA E PNEUMÁTICA LTDA",
+      "city": "PIRACICABA/SP",
+      "cnpj": "36945422000187",
+      "email": "zotellivedacoes@gmail.com",
+      "site": ""
+    }
+  ]
+}

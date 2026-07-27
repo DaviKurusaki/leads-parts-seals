@@ -16,6 +16,7 @@ export const config = Object.freeze({
   port: intEnv('PORT', 3210),
   timezone: process.env.TIMEZONE || 'America/Sao_Paulo',
   workbookPath: path.resolve(process.env.DATA_WORKBOOK || './data/campanha.xlsx'),
+  activeClientsFile: path.resolve(process.env.ACTIVE_CLIENTS_FILE || './data/clientes-ativos.json'),
   stateFile: path.resolve(process.env.STATE_FILE || './data/state.json'),
   leadSeedFile: path.resolve(process.env.LEAD_SEED_FILE || './data/leads-rfb-2026-07-12.json'),
   sendMode: (process.env.SEND_MODE || 'dry-run').toLowerCase(),
