@@ -114,10 +114,19 @@ function leadMailOptions(lead, stage, target) {
   };
 }
 
+export function selectSentMailbox(mailboxes, configuredMailbox = '') {
+  const configured = mailboxes.find(
+    (mailbox) => mailbox.path.toLowerCase() === configuredMailbox.toLowerCase(),
+  );
+  if (configured?.specialUse === '\\Sent') return configured.path;
+  return mailboxes.find((mailbox) => mailbox.specialUse === '\\Sent')?.path
+    || configured?.path
+    || '';
+}
+
 async function resolveSentMailbox(client) {
-  if (config.imap.sentMailbox) return config.imap.sentMailbox;
   const mailboxes = await client.list();
-  return mailboxes.find((mailbox) => mailbox.specialUse === '\\Sent')?.path || '';
+  return selectSentMailbox(mailboxes, config.imap.sentMailbox);
 }
 
 function createImapClient() {
