@@ -204,7 +204,7 @@
       <div class="settings-content">
         <form id="createUserForm" class="user-create-form">
           <label>Novo usuário<input id="newUsername" autocomplete="off" minlength="3" maxlength="32" required></label>
-          <label>Senha inicial<input id="newUserPassword" type="password" autocomplete="new-password" minlength="8" required></label>
+          <label>Senha inicial<input id="newUserPassword" type="password" autocomplete="new-password" minlength="6" required></label>
           <label>Permissão
             <select id="newUserRole">
               <option value="user">Usuário</option>
@@ -231,8 +231,8 @@
         <button type="button" class="icon-button" id="closePasswordDialog" aria-label="Fechar">×</button>
       </div>
       <div class="settings-content password-content">
-        <label>Nova senha<input id="newPassword" type="password" autocomplete="new-password" minlength="8" required></label>
-        <label>Confirmar nova senha<input id="confirmPassword" type="password" autocomplete="new-password" minlength="8" required></label>
+        <label>Nova senha<input id="newPassword" type="password" autocomplete="new-password" minlength="6" required></label>
+        <label>Confirmar nova senha<input id="confirmPassword" type="password" autocomplete="new-password" minlength="6" required></label>
         <div id="passwordMessage" class="message hidden" role="alert"></div>
         <button class="primary" type="submit">Salvar nova senha</button>
       </div>

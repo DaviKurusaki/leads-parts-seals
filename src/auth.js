@@ -231,8 +231,8 @@ export async function createUser(req, res) {
   const username = validateUsername(req.body.username);
   const password = String(req.body.password || '');
   const role = req.body.role === 'admin' ? 'admin' : 'user';
-  if (password.length < 8) {
-    return res.status(400).json({ error: 'A senha precisa ter pelo menos 8 caracteres.' });
+  if (password.length < 6) {
+    return res.status(400).json({ error: 'A senha precisa ter pelo menos 6 caracteres.' });
   }
 
   const admin = getSupabaseAdmin();
@@ -275,8 +275,8 @@ export async function deleteUser(req, res) {
 
 export async function changePassword(req, res) {
   const password = String(req.body.password || '');
-  if (password.length < 8) {
-    return res.status(400).json({ error: 'A senha precisa ter pelo menos 8 caracteres.' });
+  if (password.length < 6) {
+    return res.status(400).json({ error: 'A senha precisa ter pelo menos 6 caracteres.' });
   }
   const { error } = await getSupabaseAdmin().auth.admin.updateUserById(req.auth.id, { password });
   if (error) throw error;
