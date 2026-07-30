@@ -116,6 +116,19 @@ async function loadStats() {
   const campaignBadge = $('#campaignBadge');
   campaignBadge.textContent = data.campaignActive ? 'Ativa' : 'Pausada';
   campaignBadge.className = `badge ${data.campaignActive ? 'approved' : 'neutral'}`;
+  const automation = data.automation || {};
+  const automaticStatus = $('#automationStatus');
+  if (automation.inProgress) {
+    automaticStatus.textContent = `Automação executando desde ${new Date(automation.lastStartedAt).toLocaleString('pt-BR')}. Não é necessário clicar em “Processar próximo”.`;
+  } else if (automation.delayed) {
+    automaticStatus.textContent = `Atenção: o lote iniciado em ${new Date(automation.lastStartedAt).toLocaleString('pt-BR')} ainda não registrou conclusão.`;
+  } else if (automation.lastCompletedAt) {
+    automaticStatus.textContent = `Último lote automático concluído em ${new Date(automation.lastCompletedAt).toLocaleString('pt-BR')}: ${automation.lastProcessed || 0} processado(s).`;
+  } else {
+    automaticStatus.textContent = data.campaignActive
+      ? 'Campanha ativa; aguardando a próxima janela automática.'
+      : 'Campanha pausada; a automação não enviará mensagens.';
+  }
 
   const funnel = [
     ['Taxa de resposta', `${data.responseRate}%`, `${data.replied} de ${data.sent} envios`, ''],
@@ -212,11 +225,40 @@ async function loadEvents() {
   const events = await api('/api/events?limit=25');
   const container = $('#events'); container.replaceChildren();
   if (!events.length) { container.textContent = 'Nenhum evento registrado.'; return; }
+  const eventLabels = {
+    'email.sent': 'E-mail enviado',
+    'email.preview': 'Prévia gerada (nenhum e-mail enviado)',
+    'email.batch.claimed': 'Lote automático reservado',
+    'email.batch.started': 'Lote automático iniciado',
+    'email.batch.completed': 'Lote automático concluído',
+    'email.sentCopy.failed': 'Falha ao salvar em Enviados',
+    'email.error': 'Falha no envio',
+    'campaign.started': 'Campanha iniciada',
+    'campaign.paused': 'Campanha pausada',
+  };
   for (const event of events) {
     const row = document.createElement('div'); row.className = 'event';
     const time = document.createElement('time'); time.textContent = new Date(event.at).toLocaleString('pt-BR');
     const detail = document.createElement('div');
-    detail.textContent = `${event.type}${event.company ? ` — ${event.company}` : ''}${event.message ? ` — ${event.message}` : ''}`;
+    const source = event.source === 'automatic'
+      ? 'automaticamente'
+      : event.source === 'manual' ? 'manualmente' : '';
+    const mailbox = event.sentCopySaved && event.sentMailbox
+      ? `cópia salva em ${event.sentMailbox}`
+      : '';
+    const processed = event.type === 'email.batch.completed'
+      ? `${event.processed || 0} processado(s)${event.stoppedReason ? `; ${event.stoppedReason}` : ''}`
+      : '';
+    const parts = [
+      eventLabels[event.type] || event.type,
+      source,
+      event.company,
+      mailbox,
+      processed,
+      event.message,
+      event.reason,
+    ].filter(Boolean);
+    detail.textContent = parts.join(' — ');
     row.append(time, detail); container.append(row);
   }
 }

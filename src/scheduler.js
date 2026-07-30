@@ -83,6 +83,7 @@ export async function processNext({
   ignoreBusinessWindow = false,
   ignoreInterval = false,
   limitOverrides = {},
+  source = 'manual',
 } = {}) {
   if (running) return { ok: false, reason: 'Já existe um envio em processamento.' };
   running = true;
@@ -145,7 +146,17 @@ export async function processNext({
 
     lead.messageIds = [...(lead.messageIds || []), { stage, at, messageId: result.messageId }];
     getState().campaign.lastSendAt = at;
-    addEvent('email.sent', { leadId: lead.id, company: lead.company, email: lead.email, stage, dryRun: result.dryRun, messageId: result.messageId });
+    addEvent(result.dryRun ? 'email.preview' : 'email.sent', {
+      leadId: lead.id,
+      company: lead.company,
+      email: lead.email,
+      stage,
+      dryRun: result.dryRun,
+      messageId: result.messageId,
+      source,
+      sentCopySaved: result.sentCopy?.saved ?? null,
+      sentMailbox: result.sentCopy?.mailbox || '',
+    });
 
     if (!result.dryRun && config.requireSentCopy && !result.sentCopy?.saved) {
       const reason = result.sentCopy?.reason || 'A cópia não foi salva na pasta Enviados.';
@@ -222,6 +233,7 @@ export async function processScheduledBatch({ now = new Date() } = {}) {
       const result = await processNext({
         ignoreBusinessWindow: true,
         ignoreInterval: true,
+        source: 'automatic',
         limitOverrides: {
           maxPerDay: config.autoBatch.maxPerDay,
           maxPerHour: config.autoBatch.maxPerHour,

@@ -53,8 +53,18 @@ function summarize(leads) {
 
 export function stats() {
   const leads = getState().leads;
+  const events = getState().events;
   const summary = summarize(leads);
   const count = (fn) => leads.filter(fn).length;
+  const lastBatchStarted = events.find((event) => event.type === 'email.batch.started') || null;
+  const lastBatchCompleted = events.find((event) => event.type === 'email.batch.completed') || null;
+  const batchWithoutCompletion = lastBatchStarted && (
+    !lastBatchCompleted
+    || new Date(lastBatchStarted.at) > new Date(lastBatchCompleted.at)
+  );
+  const batchAgeMs = batchWithoutCompletion
+    ? Date.now() - new Date(lastBatchStarted.at).getTime()
+    : 0;
   return {
     ...summary,
     withoutEmail: count((lead) => !lead.canSend || !lead.email),
@@ -63,6 +73,14 @@ export function stats() {
     approved: count((lead) => lead.approved),
     eligibleNow: count((lead) => lead.approved && lead.canSend && !lead.optedOut && !lead.bounce && !lead.replied && !lead.paused),
     campaignActive: getState().campaign.active,
+    automation: {
+      inProgress: Boolean(batchWithoutCompletion && batchAgeMs < 20 * 60_000),
+      delayed: Boolean(batchWithoutCompletion && batchAgeMs >= 20 * 60_000),
+      lastStartedAt: lastBatchStarted?.at || null,
+      lastCompletedAt: lastBatchCompleted?.at || null,
+      lastProcessed: lastBatchCompleted?.processed ?? null,
+      lastStoppedReason: lastBatchCompleted?.stoppedReason || '',
+    },
   };
 }
 

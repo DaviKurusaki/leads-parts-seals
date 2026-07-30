@@ -221,7 +221,10 @@ app.post('/api/test-email', asyncRoute(async (req, res) => {
 }));
 
 app.post('/api/send-next', asyncRoute(async (req, res) => {
-  const result = await processNext({ ignoreBusinessWindow: Boolean(req.body.ignoreBusinessWindow) });
+  const result = await processNext({
+    ignoreBusinessWindow: Boolean(req.body.ignoreBusinessWindow),
+    source: 'manual',
+  });
   res.status(result.ok ? 200 : 400).json(result);
 }));
 

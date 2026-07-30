@@ -115,18 +115,21 @@ function leadMailOptions(lead, stage, target) {
 }
 
 export function selectSentMailbox(mailboxes, configuredMailbox = '') {
-  const outlookMailbox = mailboxes.find((mailbox) => {
-    const leaf = mailbox.path.split(/[./]/).at(-1)?.trim().toLowerCase();
-    return leaf === 'itens enviados' || leaf === 'sent items';
-  });
-  if (outlookMailbox) return outlookMailbox.path;
+  // A pasta marcada pelo servidor como \Sent é a que clientes como Outlook,
+  // Thunderbird e webmail tratam como "Itens Enviados". Um diretório com esse
+  // nome literal pode ser apenas uma pasta comum e não aparecer na visão padrão.
+  const officialMailbox = mailboxes.find((mailbox) => mailbox.specialUse === '\\Sent');
+  if (officialMailbox) return officialMailbox.path;
 
   const configured = mailboxes.find(
     (mailbox) => mailbox.path.toLowerCase() === configuredMailbox.toLowerCase(),
   );
-  return configured?.path
-    || mailboxes.find((mailbox) => mailbox.specialUse === '\\Sent')?.path
-    || '';
+  if (configured) return configured.path;
+
+  return mailboxes.find((mailbox) => {
+    const leaf = mailbox.path.split(/[./]/).at(-1)?.trim().toLowerCase();
+    return leaf === 'itens enviados' || leaf === 'sent items';
+  })?.path || '';
 }
 
 async function resolveSentMailbox(client) {

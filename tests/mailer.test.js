@@ -17,24 +17,27 @@ test('repete erros temporários de conexão', () => {
   assert.equal(isTransientSmtpError({ code: 'EAUTH' }), false);
 });
 
-test('prefere a pasta Itens Enviados que o Outlook exibe', () => {
+test('prefere a pasta oficial marcada pelo servidor como Enviados', () => {
   const mailboxes = [
     { path: 'INBOX.enviadas', specialUse: '\\Sent' },
     { path: 'INBOX.Itens Enviados' },
     { path: 'INBOX.Sent' },
   ];
-  assert.equal(selectSentMailbox(mailboxes, 'INBOX.Sent'), 'INBOX.Itens Enviados');
+  assert.equal(selectSentMailbox(mailboxes, 'INBOX.Itens Enviados'), 'INBOX.enviadas');
 });
 
-test('mantém a pasta configurada quando não existe Itens Enviados', () => {
+test('usa a pasta oficial mesmo quando há outra pasta configurada', () => {
   const mailboxes = [
     { path: 'INBOX.enviadas', specialUse: '\\Sent' },
     { path: 'INBOX.Sent' },
   ];
-  assert.equal(selectSentMailbox(mailboxes, 'inbox.sent'), 'INBOX.Sent');
+  assert.equal(selectSentMailbox(mailboxes, 'INBOX.Sent'), 'INBOX.enviadas');
 });
 
-test('usa a pasta oficial quando não há pasta do Outlook nem configuração válida', () => {
-  const mailboxes = [{ path: 'INBOX.enviadas', specialUse: '\\Sent' }];
-  assert.equal(selectSentMailbox(mailboxes, 'INBOX.Sent'), 'INBOX.enviadas');
+test('mantém a pasta configurada quando o servidor não marca uma pasta oficial', () => {
+  const mailboxes = [
+    { path: 'INBOX.Itens Enviados' },
+    { path: 'INBOX.Sent' },
+  ];
+  assert.equal(selectSentMailbox(mailboxes, 'inbox.sent'), 'INBOX.Sent');
 });
