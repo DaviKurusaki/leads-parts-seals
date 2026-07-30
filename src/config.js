@@ -83,13 +83,13 @@ export const config = Object.freeze({
   },
   autoBatch: {
     // Estes mínimos também migram automaticamente os valores antigos já
-    // cadastrados no Netlify para a nova capacidade de 60 envios por dia.
-    size: Math.max(intEnv('AUTO_BATCH_SIZE', 6), 6),
+    // cadastrados no Netlify para a nova capacidade de 120 envios por dia.
+    size: Math.max(intEnv('AUTO_BATCH_SIZE', 12), 12),
     intervalMinutes: intEnv('AUTO_BATCH_INTERVAL_MINUTES', 15),
     windows: batchWindowsEnv(),
     weekdaysOnly: boolEnv('AUTO_BATCH_WEEKDAYS_ONLY', true),
-    maxPerDay: Math.max(intEnv('AUTO_BATCH_MAX_PER_DAY', 60), 60),
-    maxPerHour: Math.max(intEnv('AUTO_BATCH_MAX_PER_HOUR', 30), 30),
+    maxPerDay: Math.max(intEnv('AUTO_BATCH_MAX_PER_DAY', 120), 120),
+    maxPerHour: Math.max(intEnv('AUTO_BATCH_MAX_PER_HOUR', 60), 60),
   },
 
   dkimSelector: process.env.DKIM_SELECTOR || '',

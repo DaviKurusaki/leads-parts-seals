@@ -38,14 +38,14 @@ test('não agenda lotes automáticos aos fins de semana', () => {
   assert.equal(autoBatchSlot(new Date('2026-08-01T12:30:00Z')), null);
 });
 
-test('agenda possui capacidade efetiva de 60 envios automáticos por dia', () => {
+test('agenda possui capacidade efetiva de 120 envios automáticos por dia', () => {
   const slots = [
     '12:30', '12:45', '13:00', '13:15', '13:30',
     '17:00', '17:15', '17:30', '17:45', '18:00',
   ].filter((time) => autoBatchSlot(new Date(`2026-07-31T${time}:00Z`)));
 
-  assert.equal(config.autoBatch.size, 6);
-  assert.equal(config.autoBatch.maxPerDay, 60);
-  assert.equal(config.autoBatch.maxPerHour, 30);
-  assert.equal(slots.length * config.autoBatch.size, 60);
+  assert.equal(config.autoBatch.size, 12);
+  assert.equal(config.autoBatch.maxPerDay, 120);
+  assert.equal(config.autoBatch.maxPerHour, 60);
+  assert.equal(slots.length * config.autoBatch.size, 120);
 });

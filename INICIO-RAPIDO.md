@@ -11,6 +11,6 @@
 9. Configure SPF, DKIM e DMARC e execute `verificar-dns.bat`.
 10. Confirme `IMAP_SENT_MAILBOX=INBOX.Sent` e `REQUIRE_SENT_COPY=true`.
 11. Faça um piloto pequeno; somente depois use `SEND_MODE=live` e `DOMAIN_AUTH_CONFIRMED=true`.
-12. Faça um novo deploy e inicie a campanha no painel. Ela enviará até 6
+12. Faça um novo deploy e inicie a campanha no painel. Ela enviará até 12
     mensagens por lote, a cada 15 minutos, de segunda a sexta, nas janelas de
     09:30–10:30 e 14:00–15:00.
