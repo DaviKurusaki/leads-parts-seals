@@ -115,12 +115,17 @@ function leadMailOptions(lead, stage, target) {
 }
 
 export function selectSentMailbox(mailboxes, configuredMailbox = '') {
+  const outlookMailbox = mailboxes.find((mailbox) => {
+    const leaf = mailbox.path.split(/[./]/).at(-1)?.trim().toLowerCase();
+    return leaf === 'itens enviados' || leaf === 'sent items';
+  });
+  if (outlookMailbox) return outlookMailbox.path;
+
   const configured = mailboxes.find(
     (mailbox) => mailbox.path.toLowerCase() === configuredMailbox.toLowerCase(),
   );
-  if (configured?.specialUse === '\\Sent') return configured.path;
-  return mailboxes.find((mailbox) => mailbox.specialUse === '\\Sent')?.path
-    || configured?.path
+  return configured?.path
+    || mailboxes.find((mailbox) => mailbox.specialUse === '\\Sent')?.path
     || '';
 }
 
