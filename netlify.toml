@@ -13,6 +13,9 @@
   # A chamada a cada 5 minutos recupera execuções atrasadas ou perdidas sem duplicar envios.
   schedule = "*/5 * * * *"
 
+[functions."campaign-worker-background"]
+  background = true
+
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/api/:splat"

@@ -5,6 +5,7 @@ import path from 'node:path';
 const entryPoints = [
   'netlify/functions/api.cjs',
   'netlify/functions/campaign-runner.cjs',
+  'netlify/functions/campaign-worker-background.cjs',
 ];
 
 for (const entryPoint of entryPoints) {

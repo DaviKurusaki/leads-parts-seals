@@ -94,7 +94,8 @@ painel, executa a API Express como Function e verifica a campanha a cada cinco
 minutos. O processador reserva um único lote a cada 15 minutos, de segunda a
 sexta, nas janelas de 09:30–10:30 e 14:00–15:00 no fuso de São Paulo, com no
 máximo seis mensagens em cada lote. As verificações extras recuperam atrasos
-do executor sem duplicar mensagens.
+do executor sem duplicar mensagens. O processamento SMTP/IMAP ocorre em uma
+função de segundo plano, evitando o limite curto da função agendada.
 
 Siga o guia [DEPLOY-NETLIFY.md](DEPLOY-NETLIFY.md). As chaves do Supabase,
 SMTP e IMAP devem ser cadastradas nas variáveis do projeto no Netlify, nunca no

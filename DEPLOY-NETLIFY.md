@@ -100,6 +100,11 @@ um único lote a cada 15 minutos, de segunda a sexta, nas janelas de
 uma execução atrasada ou perdida. Cada horário é reservado no Supabase antes
 do processamento, evitando que as tentativas extras repitam o lote.
 
+A função agendada apenas valida a janela e entrega o lote ao
+`campaign-worker-background`, que pode trabalhar por até 15 minutos. Isso evita
+que conexões SMTP ou IMAP lentas ultrapassem o limite de 30 segundos das funções
+agendadas. Jobs interrompidos são liberados novamente após 15 minutos.
+
 Cada envio ao vivo é copiado via IMAP para `IMAP_SENT_MAILBOX`, ficando visível
 em Enviados no Outlook. Se essa gravação falhar após duas tentativas, a campanha
 é pausada automaticamente. Para liberar envios reais, altere `SEND_MODE=live` e

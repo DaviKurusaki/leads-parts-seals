@@ -2,10 +2,10 @@ let initialization;
 
 exports.handler = async function handler() {
   const [
-    { processScheduledBatch },
+    { autoBatchSlot },
     { getState, loadState, refreshState },
   ] = await Promise.all([
-    import('../../src/scheduler.js'),
+    import('../../src/businessTime.js'),
     import('../../src/store.js'),
   ]);
 
@@ -16,9 +16,27 @@ exports.handler = async function handler() {
     return { statusCode: 200, body: JSON.stringify({ ok: true, skipped: 'Campanha pausada.' }) };
   }
 
-  const result = await processScheduledBatch();
+  const slot = autoBatchSlot();
+  if (!slot) {
+    return { statusCode: 200, body: JSON.stringify({ ok: true, skipped: 'Fora da agenda automática.' }) };
+  }
+
+  const siteUrl = String(process.env.URL || '').replace(/\/+$/, '');
+  const workerToken = process.env.SUPABASE_SECRET_KEY || '';
+  if (!siteUrl || !workerToken) {
+    throw new Error('URL ou SUPABASE_SECRET_KEY indisponível para iniciar o worker.');
+  }
+
+  const response = await fetch(`${siteUrl}/.netlify/functions/campaign-worker-background`, {
+    method: 'POST',
+    headers: { 'x-parts-seals-worker-token': workerToken },
+  });
+  if (!response.ok) {
+    throw new Error(`Worker em segundo plano recusou a execução: HTTP ${response.status}.`);
+  }
+
   return {
-    statusCode: result.ok ? 200 : 202,
-    body: JSON.stringify(result),
+    statusCode: 200,
+    body: JSON.stringify({ ok: true, dispatched: true, slot: slot.key }),
   };
 };

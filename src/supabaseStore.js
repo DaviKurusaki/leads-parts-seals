@@ -224,6 +224,20 @@ export async function saveSupabaseState(state, {
 
 export async function enqueueAndClaimEmailJob(eligibleLeads, workerId) {
   const client = getSupabaseAdmin();
+  const staleBefore = new Date(Date.now() - 15 * 60_000).toISOString();
+  const { error: staleError } = await client
+    .from('email_jobs')
+    .update({
+      status: 'failed',
+      available_at: new Date().toISOString(),
+      locked_at: null,
+      locked_by: null,
+      last_error: 'Worker anterior excedeu o tempo de execução; liberado para nova tentativa.',
+    })
+    .eq('status', 'processing')
+    .lt('locked_at', staleBefore);
+  if (staleError) throw new Error(`Recuperação da fila: ${staleError.message}`);
+
   if (eligibleLeads.length) {
     const rows = eligibleLeads.map(({ lead, stage }) => ({
       lead_id: lead.id,
