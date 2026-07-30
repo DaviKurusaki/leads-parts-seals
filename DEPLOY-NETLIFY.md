@@ -34,6 +34,7 @@ SENDER_EMAIL=vendas@parts-seals.com.br
 SENDER_PHONE=(19) 3626-3552 | (19) 98301-1817
 SENDER_SITE=https://parts-seals.com.br
 REPLY_TO=vendas@parts-seals.com.br
+INBOX_COPY_EMAIL=vendas@parts-seals.com.br
 BROCHURE_FILE=./output/pdf/apresentacao-comercial-parts-seals.pdf
 
 SMTP_HOST=email-ssl.com.br
@@ -106,8 +107,10 @@ que conexões SMTP ou IMAP lentas ultrapassem o limite de 30 segundos das funç�
 agendadas. Jobs interrompidos são liberados novamente após 15 minutos.
 
 Cada envio ao vivo é copiado via IMAP para `IMAP_SENT_MAILBOX`, ficando visível
-em Enviados no Outlook. Se essa gravação falhar após duas tentativas, a campanha
-é pausada automaticamente. Para liberar envios reais, altere `SEND_MODE=live` e
+em Enviados no Outlook. Além disso, `INBOX_COPY_EMAIL` recebe uma cópia oculta
+de cada prospecção e follow-up na Caixa de Entrada, sem expor esse endereço ao
+prospect. Se a gravação em Enviados falhar após duas tentativas, a campanha é
+pausada automaticamente. Para liberar envios reais, altere `SEND_MODE=live` e
 `DOMAIN_AUTH_CONFIRMED=true`, faça um novo deploy e inicie a campanha no painel.
 
 Referências oficiais:

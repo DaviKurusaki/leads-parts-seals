@@ -46,6 +46,9 @@ export const config = Object.freeze({
   senderPhone: process.env.SENDER_PHONE || '',
   senderSite: process.env.SENDER_SITE || 'https://parts-seals.com.br',
   replyTo: process.env.REPLY_TO || process.env.SENDER_EMAIL || '',
+  inboxCopyEmail: process.env.INBOX_COPY_EMAIL
+    || process.env.SENDER_EMAIL
+    || 'vendas@parts-seals.com.br',
   brochureFile: path.resolve(
     process.env.BROCHURE_FILE || './output/pdf/apresentacao-comercial-parts-seals.pdf',
   ),
@@ -114,6 +117,7 @@ export function publicConfig() {
     senderEmail: config.senderEmail,
     senderPhone: config.senderPhone,
     senderSite: config.senderSite,
+    inboxCopyEmail: config.inboxCopyEmail,
     imapEnabled: config.imap.enabled,
     requireSentCopy: config.requireSentCopy,
     researchEnabled: Boolean(config.openaiApiKey),

@@ -1,6 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { isTransientSmtpError, selectSentMailbox } from '../src/mailer.js';
+import {
+  buildLeadMailOptions,
+  isTransientSmtpError,
+  selectSentMailbox,
+} from '../src/mailer.js';
 
 test('classifica respostas SMTP 4xx como temporárias', () => {
   assert.equal(isTransientSmtpError({ responseCode: 451 }), true);
@@ -40,4 +44,16 @@ test('mantém a pasta configurada quando o servidor não marca uma pasta oficial
     { path: 'INBOX.Sent' },
   ];
   assert.equal(selectSentMailbox(mailboxes, 'inbox.sent'), 'INBOX.Sent');
+});
+
+test('envia cópia oculta de toda prospecção para a caixa comercial', () => {
+  const options = buildLeadMailOptions({
+    id: 123,
+    subject: 'Assunto',
+    initialBody: 'Mensagem inicial',
+    privacyFooter: 'Responda REMOVER para sair.',
+  }, 0, 'prospect@example.com');
+
+  assert.equal(options.to, 'prospect@example.com');
+  assert.equal(options.bcc, 'vendas@parts-seals.com.br');
 });

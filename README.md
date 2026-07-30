@@ -183,6 +183,10 @@ de uma mensagem não puder ser gravada em Enviados após duas tentativas, o envi
 é registrado, mas a campanha é pausada imediatamente para revisão. A mensagem
 não é repetida automaticamente.
 
+Defina `INBOX_COPY_EMAIL=vendas@parts-seals.com.br` para que cada prospecção e
+follow-up também chegue como cópia oculta à Caixa de Entrada comercial. Se a
+variável não for preenchida, a automação usa `SENDER_EMAIL`.
+
 ## Pesquisa web opcional
 
 Com `OPENAI_API_KEY` preenchida, o botão **Pesquisar empresa** usa web search para buscar:

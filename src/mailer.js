@@ -90,7 +90,7 @@ async function saveDryRun({ lead, stage, target, message }) {
   };
 }
 
-function leadMailOptions(lead, stage, target) {
+export function buildLeadMailOptions(lead, stage, target) {
   const message = stageMessage(lead, stage);
   const unsubscribeEmail = config.replyTo || config.senderEmail;
   const headers = {
@@ -101,6 +101,9 @@ function leadMailOptions(lead, stage, target) {
   return {
     from: { name: config.senderName, address: config.senderEmail },
     to: target,
+    // A cópia oculta faz cada mensagem e follow-up também chegar à Caixa de
+    // Entrada comercial sem revelar o endereço interno ao prospect.
+    bcc: config.inboxCopyEmail || undefined,
     replyTo: config.replyTo || undefined,
     subject: message.subject,
     text: message.text,
@@ -179,7 +182,7 @@ export async function saveLeadCopyToSent(lead, stage, target, {
     return { saved: false, reason: 'Configuração IMAP incompleta.' };
   }
 
-  const mailOptions = leadMailOptions(lead, stage, target);
+  const mailOptions = buildLeadMailOptions(lead, stage, target);
   const rawTransport = nodemailer.createTransport({
     streamTransport: true,
     buffer: true,
@@ -232,7 +235,7 @@ export async function sendLeadEmail(lead, stage = 0, targetOverride = '') {
   if (issues.length) throw new Error(`Envio ao vivo bloqueado: ${issues.join(' ')}`);
 
   const sentAt = new Date();
-  const info = await sendMailWithRetry(leadMailOptions(lead, stage, target));
+  const info = await sendMailWithRetry(buildLeadMailOptions(lead, stage, target));
   const sentCopy = await saveSentCopyWithRetry(lead, stage, target, {
     messageId: info.messageId,
     sentAt,
