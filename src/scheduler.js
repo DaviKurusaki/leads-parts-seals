@@ -211,7 +211,11 @@ export async function processScheduledBatch({ now = new Date() } = {}) {
     }
     if (!claimed) return { ok: true, skipped: 'Este lote já foi processado.', slot: slot.key };
 
-    addEvent('email.batch.started', { slot: slot.key, batchSize: config.autoBatch.size });
+    addEvent('email.batch.started', {
+      slot: slot.key,
+      window: slot.window,
+      batchSize: config.autoBatch.size,
+    });
     const results = [];
     let stoppedReason = '';
     for (let index = 0; index < config.autoBatch.size; index += 1) {
@@ -241,6 +245,7 @@ export async function processScheduledBatch({ now = new Date() } = {}) {
     }
     addEvent('email.batch.completed', {
       slot: slot.key,
+      window: slot.window,
       requested: config.autoBatch.size,
       processed: results.length,
       stoppedReason,
@@ -249,6 +254,7 @@ export async function processScheduledBatch({ now = new Date() } = {}) {
     return {
       ok: true,
       slot: slot.key,
+      window: slot.window,
       requested: config.autoBatch.size,
       processed: results.length,
       stoppedReason: stoppedReason || null,
@@ -265,6 +271,7 @@ async function tick() {
 
 export function startScheduler() {
   if (timer) return;
+  tick().catch(console.error);
   timer = setInterval(() => tick().catch(console.error), 60_000);
   timer.unref?.();
 }

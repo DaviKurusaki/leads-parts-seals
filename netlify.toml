@@ -9,7 +9,9 @@
   included_files = ["output/pdf/**", "config/**", "prompts/**"]
 
 [functions."campaign-runner"]
-  schedule = "*/15 * * * *"
+  # A aplicação reserva internamente somente um lote a cada 15 minutos.
+  # A chamada a cada 5 minutos recupera execuções atrasadas ou perdidas sem duplicar envios.
+  schedule = "*/5 * * * *"
 
 [[redirects]]
   from = "/api/*"

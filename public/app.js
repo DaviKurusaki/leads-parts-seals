@@ -91,8 +91,11 @@ async function loadConfig() {
   $('#modeBadge').style.background = live ? 'rgba(55,150,95,.25)' : 'rgba(255,255,255,.12)';
   const schedule = appConfig.autoBatch;
   if (schedule) {
-    const days = schedule.everyDay ? 'todos os dias' : 'de segunda a sexta';
-    $('#scheduleSummary').textContent = `Automático: até ${schedule.size} envios a cada ${schedule.intervalMinutes} minutos, ${days}, das ${schedule.start} às ${schedule.end}.`;
+    const days = schedule.weekdaysOnly ? 'de segunda a sexta' : 'todos os dias';
+    const windows = schedule.windows
+      .map((window) => `${window.start}–${window.end}`)
+      .join(' e ');
+    $('#scheduleSummary').textContent = `Automático: até ${schedule.size} envios a cada ${schedule.intervalMinutes} minutos, ${days}, nas janelas ${windows} (${appConfig.timezone}), com limite de ${schedule.maxPerDay} por dia.`;
   }
 }
 

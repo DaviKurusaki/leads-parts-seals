@@ -13,7 +13,8 @@ Sistema preparado para manter uma fila online e segura de prospecção personali
 - Dashboard de aprovação, edição e acompanhamento.
 - Publicação serverless no Netlify, sem computador local ligado.
 - Tela de login, sessão protegida e gestão de usuários administradores/comuns.
-- Envio automático em lotes de 5, a cada 15 minutos, todos os dias, das 14:00 às 15:30.
+- Envio automático em lotes de até 6, a cada 15 minutos, de segunda a sexta,
+  nas janelas de 09:30–10:30 e 14:00–15:00.
 - Cópia obrigatória de cada mensagem na pasta Enviados acessível pelo Outlook.
 - Modo seguro `dry-run`, que cria prévias em HTML sem enviar mensagens reais.
 - Follow-ups automáticos somente quando não houver resposta, opt-out ou bounce.
@@ -89,9 +90,11 @@ apenas abre o painel novamente.
 ## Publicação no Netlify
 
 O site não precisa de servidor local depois de publicado. O Netlify serve o
-painel, executa a API Express como Function e chama o processador da campanha a
-cada 15 minutos. O processador só libera os sete horários diários entre 14:00 e
-15:30 no fuso de São Paulo, com no máximo cinco mensagens em cada lote.
+painel, executa a API Express como Function e verifica a campanha a cada cinco
+minutos. O processador reserva um único lote a cada 15 minutos, de segunda a
+sexta, nas janelas de 09:30–10:30 e 14:00–15:00 no fuso de São Paulo, com no
+máximo seis mensagens em cada lote. As verificações extras recuperam atrasos
+do executor sem duplicar mensagens.
 
 Siga o guia [DEPLOY-NETLIFY.md](DEPLOY-NETLIFY.md). As chaves do Supabase,
 SMTP e IMAP devem ser cadastradas nas variáveis do projeto no Netlify, nunca no
@@ -118,8 +121,16 @@ Preencha `SENDER_EMAIL` e `DKIM_SELECTOR`; execute `verificar-dns.bat`. A ferram
 - Envie testes para uma caixa interna.
 - Ative o IMAP para bloquear follow-ups quando houver resposta e salvar cada
   mensagem em Enviados.
-- A agenda automática permite até 35 mensagens por dia: 5 por lote, a cada 15
-  minutos, todos os dias, das 14:00 às 15:30.
+- A agenda automática permite até 60 mensagens por dia: até 6 por lote, a cada
+  15 minutos, de segunda a sexta, nas janelas de 09:30–10:30 e 14:00–15:00.
+
+Os limites existem para evitar picos que prejudiquem a reputação do domínio,
+acionem filtros antispam ou ultrapassem a cota do provedor da caixa. O piloto
+manual usa `MAX_PER_DAY=20` e `MAX_PER_HOUR=5`; a agenda usa
+`AUTO_BATCH_MAX_PER_DAY=60` e `AUTO_BATCH_MAX_PER_HOUR=30`. Eles podem ser
+aumentados nas variáveis de ambiente, preferencialmente de forma gradual e
+acompanhando bounces, respostas e reclamações. Não é recomendado remover
+completamente o teto diário.
 
 ### 4. Envio ao vivo
 

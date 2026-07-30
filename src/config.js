@@ -12,6 +12,24 @@ function boolEnv(name, fallback = false) {
   return ['1', 'true', 'sim', 'yes', 'on'].includes(value);
 }
 
+function batchWindowsEnv() {
+  const value = process.env.AUTO_BATCH_WINDOWS || '09:30-10:30,14:00-15:00';
+  const windows = value.split(',').map((window) => window.trim()).filter(Boolean);
+  const validTime = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
+  if (!windows.length || windows.some((window) => {
+    const [start, end] = window.split('-').map((part) => part?.trim());
+    return !validTime.test(start || '') || !validTime.test(end || '') || start > end;
+  })) {
+    throw new Error(
+      'AUTO_BATCH_WINDOWS inválido. Use o formato 09:30-10:30,14:00-15:00.',
+    );
+  }
+  return windows.map((window, index) => {
+    const [start, end] = window.split('-').map((part) => part.trim());
+    return Object.freeze({ id: index + 1, start, end });
+  });
+}
+
 export const config = Object.freeze({
   port: intEnv('PORT', 3210),
   timezone: process.env.TIMEZONE || 'America/Sao_Paulo',
@@ -64,13 +82,14 @@ export const config = Object.freeze({
     followup2BusinessDays: intEnv('FOLLOWUP2_BUSINESS_DAYS', 9),
   },
   autoBatch: {
-    size: intEnv('AUTO_BATCH_SIZE', 5),
+    // Estes mínimos também migram automaticamente os valores antigos já
+    // cadastrados no Netlify para a nova capacidade de 60 envios por dia.
+    size: Math.max(intEnv('AUTO_BATCH_SIZE', 6), 6),
     intervalMinutes: intEnv('AUTO_BATCH_INTERVAL_MINUTES', 15),
-    start: process.env.AUTO_BATCH_START || '14:00',
-    end: process.env.AUTO_BATCH_END || '15:30',
-    everyDay: boolEnv('AUTO_BATCH_EVERY_DAY', true),
-    maxPerDay: intEnv('AUTO_BATCH_MAX_PER_DAY', 35),
-    maxPerHour: intEnv('AUTO_BATCH_MAX_PER_HOUR', 25),
+    windows: batchWindowsEnv(),
+    weekdaysOnly: boolEnv('AUTO_BATCH_WEEKDAYS_ONLY', true),
+    maxPerDay: Math.max(intEnv('AUTO_BATCH_MAX_PER_DAY', 60), 60),
+    maxPerHour: Math.max(intEnv('AUTO_BATCH_MAX_PER_HOUR', 30), 30),
   },
 
   dkimSelector: process.env.DKIM_SELECTOR || '',

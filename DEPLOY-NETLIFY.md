@@ -52,13 +52,12 @@ IMAP_MAILBOX=INBOX
 IMAP_SENT_MAILBOX=INBOX.Sent
 REQUIRE_SENT_COPY=true
 
-AUTO_BATCH_SIZE=5
+AUTO_BATCH_SIZE=6
 AUTO_BATCH_INTERVAL_MINUTES=15
-AUTO_BATCH_START=14:00
-AUTO_BATCH_END=15:30
-AUTO_BATCH_EVERY_DAY=true
-AUTO_BATCH_MAX_PER_DAY=35
-AUTO_BATCH_MAX_PER_HOUR=25
+AUTO_BATCH_WINDOWS=09:30-10:30,14:00-15:00
+AUTO_BATCH_WEEKDAYS_ONLY=true
+AUTO_BATCH_MAX_PER_DAY=60
+AUTO_BATCH_MAX_PER_HOUR=30
 
 MAX_PER_DAY=20
 MAX_PER_HOUR=5
@@ -94,11 +93,12 @@ Alterações em variáveis de ambiente exigem um novo deploy para entrarem em
 vigor. O agendador funciona apenas no deploy publicado; previews de branches
 não executam a agenda automaticamente.
 
-Quando a campanha estiver ativa, o Netlify chama o processador a cada 15
-minutos. O aplicativo confere o horário no fuso `America/Sao_Paulo` e libera
-até cinco mensagens às 14:00, 14:15, 14:30, 14:45, 15:00, 15:15 e 15:30,
-inclusive aos fins de semana. Cada horário é reservado no Supabase antes do
-processamento, evitando que execuções concorrentes repitam o lote.
+Quando a campanha estiver ativa, o Netlify chama o processador a cada cinco
+minutos. O aplicativo confere o horário no fuso `America/Sao_Paulo` e reserva
+um único lote a cada 15 minutos, de segunda a sexta, nas janelas de
+09:30–10:30 e 14:00–15:00. A frequência de cinco minutos permite recuperar
+uma execução atrasada ou perdida. Cada horário é reservado no Supabase antes
+do processamento, evitando que as tentativas extras repitam o lote.
 
 Cada envio ao vivo é copiado via IMAP para `IMAP_SENT_MAILBOX`, ficando visível
 em Enviados no Outlook. Se essa gravação falhar após duas tentativas, a campanha
